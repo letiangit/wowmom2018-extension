@@ -1,0 +1,168 @@
+\section{Surrogate Model of \gls{raw} performance \label{sec:SUMO}}
+
+This sections introduces the surrogate modeling approach and toolbox, as well as its integration with the ns-3 network simulator. Subsequently, we describe how surrogate modeling can be used to train a performance model using supervised machine learning, for estimating throughput of the IEEE~802.11ah \gls{raw} under a wide range of network and traffic conditions.
+%Table \ref{tab:variables} provides an overview of the variables used in the description of the RAW modeling and proposed algorithm in section \ref{sec:algorithm}.
+
+
+\subsection{Surrogate model training methodology}
+In order for the \gls{ap} to determine the optimal \gls{raw} parameters in real-time, a \gls{raw} performance model is needed. Given the current network conditions (e.g., network topology, traffic) and a set of \gls{raw} parameter values (e.g., number of groups and slots, group duration, station assignment) the model should estimate performance (e.g., in terms of throughput). Based on this model, optimal \gls{raw} parameters can subsequently be derived based on current network conditions. However, existing analytical models are computationally expensive and unrealistic due to their assumptions. Surrogate modeling provides the answer~\cite{SUMOtoolbox2010}. A surrogate model is trained at design time, using a limited number of input-output sample data points obtained through simulation or real-life experiments. Surrogate modeling is especially suited for tasks with a large input space, as an accurate model can be trained based on relatively little input data points. Moreover, evaluating the model at runtime is computationally efficient, equivalent to a constant-time table lookup.
+%, \textcolor{red}{or can be easily executed by applying fast heuristic optimization algorithms (e.g., particle swarm optimization)} .
+This makes surrogate modeling highly suitable for \gls{raw} performance modeling, as the input space is very large, and efficient runtime model evaluation is needed for real-time \gls{raw} parameter selection. Additionally, by using realistic simulation results, a surrogate model does not suffer from the same restrictive assumptions as existing analytical models.
+
+
+
+\begin{figure}[t]
+  \centering
+   \subfloat[General SUMO modeling architecture. \label{fig:sumo}]{\includegraphics[width=0.7\columnwidth]{image/SUMO.pdf}}\\
+   \subfloat[Integrated \gls{raw} model training using SUMO and ns-3. \label{fig:SUMO_NS3}]{\includegraphics[width=0.7\columnwidth]{image/sumons3.pdf}}
+  \caption{Training methodology used to model \gls{raw} performance.}
+\end{figure}
+
+The Matlab \glsreset{sumo}\gls{sumo} Toolbox is a flexible framework for accurate global surrogate modeling~\cite{SUMOtoolbox2010}. %It has been is applicable to a wide range of domains, including automotive, microwave filter, wireless network \cite{mehari2015}\cite{mehari2016}, etc. It supports a large set of plugins, each component is configurable and can easily be added, removed or replaced by custom implementations. The SUMO toolbox can be applied in an black-box fashion,
+The general \gls{sumo} modeling architecture is illustrated in Figure~\ref{fig:sumo}. The controller plays the key role, managing the modeling process. First, the user offers a set of initial sample data points (including input and output) to the controller. The controller uses those points to construct an initial surrogate model. Next, with the constructed model, the controller predicts the next input space element from which the expected accuracy improvement is the largest. The modeling process keeps iterating, and terminates once certain stopping conditions are met (e.g., the maximum training time is exceeded).
+
+To train the \gls{raw} model, we used our previously developed IEEE~802.11ah ns-3 simulation module~\cite{WNS32016}. Figure~\ref{fig:SUMO_NS3} shows our adapted training methodology to allow the integration between ns-3 and the \gls{sumo} toolbox.
+The modified controller conducts similar tasks as the original \gls{sumo} controller. However, it now directly interfaces with ns-3. When a new sample data point is generated for which the output is unknown, the controller will initiate an ns-3 simulation to determine the output associated with the input parameter values of the data point. The \gls{sumo} toolbox executes the following steps to train the \gls{raw} performance surrogate model, using the same numbering as the arrows in Figure~\ref{fig:SUMO_NS3}:
+\begin{enumerate}
+\item \label{sm_tr_1} The controller reads the settings of the 802.11ah \gls{raw} experiment, including the general parameters of 802.11ah (cf. Table~\ref{tab:ns3 parameters}) and the input space parameters (cf. Table~\ref{tab:sumo parameters}). 
+
+\item \label{sm_tr_2} The controller generates an initial sample set based on the input space, and starts ns-3 experiments with the required settings. 
+%The sample method used is Latin Hypercube Sampling (LHS), which is a stratified sampling method that selects sample points evenly along the input space while ensuring proportional representation of design variables. 
+
+\item \label{sm_tr_3} At the end of each experiment, the controller retrieves the evaluation criterion (e.g., throughput) of the experiment and builds the sample data space.  
+
+\item \label{sm_tr_4} After the experiments with the initial sample data set, the controller builds the surrogate model and calculates the cross validation score. %If the score is below a threshold, the experiment stops executing. Otherwise, it continues with the next step.
+
+\item \label{sm_tr_5} The built surrogate model estimates the next sample data point to evaluate with the highest expected accuracy improvement. 
+
+\item \label{sm_tr_6} The controller starts the next ns-3 experiment for the newly selected sample data point. 
+
+\item \label{sm_tr_7} The controller reads the output of the experiment and updates the sample data space, then goes back to step \ref{sm_tr_4}. This process continues until the stop conditions are met.
+%cross validation score satisfies the threshold, or the maximum allowed training time has been reached.
+\end{enumerate}
+
+In our experiments, the SUMO toolbox is configured to use the latin hypercube sampling method~\cite{FAViana2013} to generate 100 initial sample data points, Kriging interpolation is used to train the model~\cite{JMLRv15couckuyt14a},  FLOLA-Voronoi sampling for generating the next sample points~\cite{van2015fuzzy}, and the 10-fold cross-validation with a \gls{rrse} measure to evaluate the model accuracy~\cite{van2016sensitivity}. The training stops once the cross-validation score lower than or equal to $0.10$ (2 digits of precision) occurs $10$ times in succession, or the number of training data points exceeds $2500$.
+
+
+\subsection{Training scenario}
+
+In this section, we provide an overview of the static simulation environment parameters used during training. Since the goal of \gls{raw} is scalability under uplink traffic, we consider an \gls{iot} sensing scenario, where sensors periodically monitor the environment and send the resulting data to a server (via the \gls{ap}). The PHY and MAC layer parameters are shown in Table~\ref{tab:ns3 parameters}. Given the low-power nature of battery powered sensors, the PHY layer parameters are configured based on the low-power 802.11ah radio hardware prototype developed by Ba et al.~\cite{Ba2016}, with a transmission power of 0~dBm, a gain of 0~dBi (for both sensor and \gls{ap}), and noise figure of 6.8~dB. In order to obtain a model that is independent of the actual deployment of stations, stations are randomly placed around the AP within a maximum radius. The size of the stations' transmit queues is configured to be 10 packets. As the RAW optimization algorithm proposed in Section~\ref{sec:algorithm} groups together stations that use the same \gls{mcs}, the model assumes a fixed \gls{mcs}. However, as \gls{raw} performance depends on the \gls{mcs} used, a different model is to be trained for each \gls{mcs} that stations are expected to use. We illustrate this by developing a separate a high-throughput (HT) and low-throughput (LT) model for two different \gls{mcs} parameter sets. This can be trivially extended to other \gls{mcs} values.  For training simplicity, we assume each station sends one packet per second. However, we show in Section~\ref{sec:algorithm} how this model can be used to calculate \gls{raw} performance under arbitrary data transmission intervals. Each experiment runs for 60 seconds of simulated time. As \gls{raw} is configured in each beacon interval of 204.8~ms, the results of every simulated configuration are averaged over 290 beacon intervals, ensuring the generality of the trained model.
+
+%minimizing variety  the  the  high readability on the results  
+
+%\textcolor{red}{TODO: we need to mention how many times (i.e., beacon intervals) each experiment is repeated for training, and show that this makes it robust to the random effects of CSMA...}
+
+\begin{table}[t]
+\centering
+\renewcommand{\arraystretch}{1.2}
+%\tiny
+\caption{\textsc{Simulation parameters used during training}\label{tab:ns3 parameters}}
+\begin{tabular}{ll}
+\hline
+\textbf{PHY parameters}             & \textbf{Value}  \\
+\hline
+%Frequency (Mhz)                      & 868 \\
+TX power (dBm)             & 0    \\
+TX/RX gain (dB)                        & 0     \\
+Noise Figure (dB)               & 6.8      \\  
+%Coding method                  & BCC \\
+Propagation model         & Outdoor \\ %, macro~\cite{Hazmi2012} \\
+Error rate model               & YansErrorRate \\
+\hline
+\textbf{MAC parameters}               & \textbf{Value}  \\
+\hline
+% CWmin                          & 15 \\
+% CWmax                          & 1023      \\
+%Duration of AIFS (us)\textcolor{red}{change to DIFS}            & 316      \\
+Traffic access categories             & \textcolor{black}{ AC\_{BE} } \\
+Duration of AIFS ($\mu$s)             & 264      \\
+Duration of SIFS ($\mu$s)            & 160      \\
+%RTS/CTS                        & not enabled  \\
+Beacon interval (ms)           & 204.8 \\
+%Cross slot boundary            & Enabled \\
+%Rate control algorithm         & constant  \\
+Size of transmission queue (packets)  & 10  \\
+Packet transmission interval (s)        & 1  \\
+Station distribution           & random  \\
+\hline
+\textbf{High-Throughput (HT) parameters}  & \textbf{value} \\
+\hline
+Wi-Fi mode                     & MCS1, 1 Mhz \\
+Average payload size (bytes)           & 64   \\
+Topology radius (m)     & 200  \\
+\hline
+\textbf{Low-Throughput (LT) parameters}  & \textbf{value}  \\
+\hline
+Wi-Fi mode                     & MCS9, 1 Mhz \\
+Average payload size (bytes)           & 256   \\
+Topology radius (m)     & 80  \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{comment}
+\begin{table*}[t]
+\centering
+\begin{threeparttable}
+\caption{Variables and notations introduced in the SUMO modeling and algorithm description \label{tab:variables}}
+\begin{tabular}{lr}
+\hline
+\textbf{General variables}           & \textbf{Description}  \\
+\hline
+$\mathcal{B}$           & Beacon interval \\
+$\mathcal{S}$            & Set of all stations\\
+\hline
+\textbf{Variables  of RAW group $r$}   & \textbf{Description}  \\
+\hline
+${s}_r$         & Number of stations assigned to group $r$ \\
+${d}_r$         & Duration of group $r$ \\
+${l}_r$         & RAW slot number of group $r$ \\
+\hline
+\end{tabular}
+%  \begin{tablenotes}
+%       \small
+%       \item[$\star$] Expressed as a multiple of number of beacon intervals.
+%     \end{tablenotes}
+\end{threeparttable}
+\end{table*}
+\end{comment}
+
+
+\subsection{Input parameters for RAW modeling}
+
+% In order to build the surrogate model, a representative set of data samples must be collected to build a model with sufficient accuracy.
+% Data samples are collected in such a way that the model
+% accuracy can be maximized while minimizing the number
+% of experiments needed. In sequential steps, a well-chosen set of
+% experiments are performed by making a balanced trade-off
+% between two different criteria, namely exploration and
+% exploitation
+
+The surrogate model aims to accurately predict throughput $t_r$, for a RAW group $r$ with duration $d_r$, consisting of $s_r$ slots, and with $n_r$ stations assigned to it. The resulting model can be represented as a function $\mathcal{F}$, as follows:
+\begin{equation} \label{eq:sumo_model}
+t_r = \mathcal{F}(n_r, d_r, s_r)
+\end{equation}
+In addition to throughput, the simulator calculates a variety of other performance metrics, such as packet loss, latency and energy consumption. As such, the same methodology as described here can be used to train a model for predicting these other performance metrics. However, to simplify the explanation, we focus on throughput.
+
+To build the \gls{sumo} model, the input parameter space needs to be defined. It consists of the minimum and maximum value of each parameter, as well as a step size. The minimum and maximum can be determined based on expert knowledge of \gls{raw} performance, as well as legal values defined by the IEEE~802.11ah standard. The range of the number of stations $n_r$ in a \gls{raw} group should span from low to high traffic conditions, so the trained model gives accurate results independent of the density. From our previous studies on \gls{raw} performance~\cite{WoWMoM2016}, and based on the parameters listed in Table~\ref{tab:ns3 parameters}, a minimum value of $60$ and maximum value of $400$ stations per group were deemed to cover all possible traffic conditions. The RAW group duration should be large enough to send at least 1 packet successfully, and at most equal to the duration of the beacon intervals. As such, $d_r$ is varied between $40960$~$\mu$s and $204800$~$\mu$s. The number of slots $s_r$ is bound between $1$ and $64$, as per the IEEE standard. However, a very high number of slots leaves not enough time within a slot to successfully transmit a packet. As such, we limit $s_r$ between 1 and 50.
+
+The actual step size of $n_r$ and $s_r$ is $1$, as they are integer variables. The parameter $d_r$ has a step size of $120$~$\mu$s, as defined in the 802.11ah standard. This results in a total input space of $2.3 \times 10^7$ possible data points. This is too high to properly train the model in a feasible amount of time. To alleviate this, we experimentally determined a good step size for each of the three parameters, leveraging the trade-off between accuracy and training speed. For $n_r$ and $s_r$ a step size of 5 was selected. It was found that the \gls{raw} duration $d_r$ has a high sensitivity. As such, a small value of $5120$~$\mu$s was chosen as its step size. This results in a significantly reduced input space of $25047$ data points. Table~\ref{tab:sumo parameters} summarizes the selected input parameter space. Note that a slot count $s_r$ equal to $0$ is not legal, and $s_r$ therefore takes on values from the set $\left\{1, 5, 10, ..., 50\right\}$. Results for data points outside the reduced input parameter space are obtained via linear interpolation of the two nearest data points included in the model.
+%\textcolor{red} {The obtained surrogate model is extended by using linear interpolation to predict results of RAW configurations that are outside the reduced input parameters space.}
+
+%\textcolor{red}{TODO: we need to explain how you can obtain results for values that are outside of the listed training values (e.g., $n_i = 7$). That is currently not mentioned at all.}
+
+\begin{table}[t]
+\centering
+\renewcommand{\arraystretch}{1.2}
+%\tiny
+\caption{\textsc{Definition of the input parameter space}\label{tab:sumo parameters}}
+\begin{tabular}{llll}
+\hline
+\textbf{Parameter}       & \textbf{Min}  & \textbf{Step}   & \textbf{Max}  \\
+\hline
+$n_r$        & 60 & 5 & 400  \\
+$d_r$ ($\mu$s)          & 40960 & 5120 & 204800    \\
+$s_r$           & 1 & 5 & 50    \\
+\hline
+\end{tabular}
+\end{table}

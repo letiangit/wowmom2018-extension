@@ -1,0 +1,318 @@
+\section{Main idea \label{sec:main_idea}}
+Table \ref{tab:variables} lists all the variable used in the algorithm description, figure ~\ref{fig:sumo-throughput} and \ref{fig:sumo-packetNum} give examples of SUMO results. \\
+
+\textbf{Derived from the SUMO:} \\
+For stations sending one packet \textbf{every} second
+%, with stations number, we can get the \{RAW group duration, slot number\}, which gives \textbf{highest throughput} or \textbf{maximal number of successfully transmitted packets}. It can be represented as:\\
+%\{$\mathcal{S}^r$, $\mathcal{D}^r_\textit{opt}$, $\mathcal{SL}^r_\textit{opt}$, $\pi^r_\textit{opt}$\} \\
+
+\begin{equation}
+\pi = f(\mathcal{S}^r, \mathcal{D}^r, \mathcal{SL}^r)
+\end{equation}
+
+It can be further extend. For stations sending one packet \textbf{every m} second
+\begin{equation}
+\pi = f(\mathcal{S}^r/m, \mathcal{D}^r, \mathcal{SL}^r)
+\end{equation}
+
+m should satisfy:\\
+\begin{enumerate}
+\item Integer, or
+\item $1/m$ is integer, $1 < 1/m <= 5(1000ms/204.8ms) $. \\
+Boundary of $1/m$: In SUMO, each station is expected to send at most one packets per beacon interval (one packet per seconds, beacon interval(204.8 ms) is less than one seconds). When $1/m$ is larger than 5 (1000ms/204.8ms), a station has more than one packet to send for one beacon interval, the model derived from SUMO \textbf{may} not work (not very sure). In theory, $SL$ should not be changed. \\
+
+\textbf{Question, is slot needed for SUMO modeling?}
+
+
+
+\end{enumerate}
+
+
+
+
+
+
+
+\textbf{The target scenario}: 
+%Stations  \textbf {sending one packet per $x$ (integer) second}. maximize number of packets get transmitted successfully (per beacon interval).\\
+\begin{enumerate}
+\item Station $s$ \textbf {sending one packet per $x=t^s_{int}$ (integer) second}.
+\item Transmission interval $X$ changes from station to station.
+\item For each $x \in X$, there are $N_x$ stations.
+\item $N$ stations in total in the network.
+\item Traffic load $T = \sum_{x \in \mathcal{X}}   N_x * Payload /x$.
+\end{enumerate} 
+% \begin{equation}
+%  \sum_{x \in \mathcal{X}}   N_x * Payload /x
+% \end{equation}
+\textbf{Objective}: \\
+Maximize number of packets get transmitted successfully (per beacon interval). \\
+\textbf{Steps}:
+\begin{itemize}
+\item Station assignment for one beacon interval. \\
+\textbf{Goal}: traffic load balance among each beacon interval.\\
+\textbf{Input}: \\
+See the target scenario. \\
+\textbf{Optimization}: \\
+\begin{equation}
+\min std. T^B, B={b_1, b_2, ..., b_m} \\
+\end{equation}
+
+Subject to:
+\begin{equation}
+aver. \sum_{b \in \mathcal{B}}  T^b = T
+\end{equation}
+Station $s \in S$ is assigned to beacon at every $t^s_{int}$ beacon interval.
+
+\textbf{Output}: \\
+For beacon $b \in B$, \{$S^b, BI, T^b$\}, $T^b$ traffic load for beacon interval $b$ \\
+% \item Station Cluster, satisfy the SUMO requirement, making each station \textbf{sending one packet every its channel accessing interval}.\\
+% Cluster stations $S$ with same $x \in X$, get a set of clusters $K$. For example, cluster $k \in K$ contains station with $x=t^k_{int}$. Furthermore, evenly divide cluster $k \in K$ into $t^k_{int}$ clusters to get a set of cluster \{$k_1$,$k_2$, ..., $k_{t^k_{int}}$\} \textcolor{red}{(same transmission interval)}. Assign these cluster to beacons in a round-robin way, each cluster is allowed to transmitted every $t^k_{int}$ beacon interval. Thus, a set of clusters $K^b$ are assigned to one beacon interval, it includes $|X|$ clusters, each cluster has different transmission interval. 
+\item Station grouping, including group duration, slot number. \\
+\textbf{Goal}: Maximize number of packets get transmitted successfully (one beacon interval).\\
+%With the results of cluster and SUMO, further divide the cluster into RAW groups, maximize the number of packets get transmitted successfully (per beacon interval).
+\textbf{Input for beacon interval $b$}: \\
+\{$S^b, BI, T^b$\}, $T^b$ traffic load for beacon interval $b$ \\
+\textbf{Optimization for beacon interval $b$}: 
+\begin{equation}
+\max \sum_{r \in \mathcal{R}^b}  f(\mathcal{S}^r, \mathcal{D}^r, \mathcal{SL}^r) \\
+\end{equation}
+
+Subject to
+\begin{equation}
+\sum_{r \in R^b} \mathcal{D}^r \leq BI
+\end{equation}
+
+\begin{equation}
+\sum_{r \in R^b} \mathcal{S}^r = S^b
+\end{equation}
+
+% \begin{equation}
+% k_i \cap k_j = \emptyset， \quad k_i, k_j \subset \mathcal{K}^b
+% \end{equation}
+
+\begin{equation}
+r_i \cap r_j = \emptyset， \quad r_i, r_j \subset \mathcal{R}^b
+\end{equation}
+
+\textbf{Output for beacon interval $b$}: \\
+$R^b$, for each $r \in R^b$, \{${S}^r, {D}^r, {SL}^r$\}
+
+
+\end{itemize}
+
+
+\begin{figure*}[t]
+    \subfloat[180 stations \label{fig:traffic-pattern-throughput}]{\includegraphics[width=0.33\textwidth]{image/SUMO_THROUGHPUT/Stations181}}
+    \subfloat[240 stations \label{fig:traffic-pattern-throughput}]{\includegraphics[width=0.33\textwidth]{image/SUMO_THROUGHPUT/Stations241}}
+    \subfloat[400 stations \label{fig:traffic-pattern-throughput}]{\includegraphics[width=0.33\textwidth]{image/SUMO_THROUGHPUT/Stations401}}
+  \caption{Influence of number of RAW group duration and slot number on throughput for different number of stations \label{fig:sumo-throughput}}
+\end{figure*}
+
+
+
+\begin{figure*}[t]
+    \subfloat[180 stations \label{fig:traffic-pattern-throughput}]{\includegraphics[width=0.33\textwidth]{image/SUMO_PACKETSRE/Stations181}}
+    \subfloat[240 stations \label{fig:traffic-pattern-throughput}]{\includegraphics[width=0.33\textwidth]{image/SUMO_PACKETSRE/Stations241}}
+    \subfloat[400 stations \label{fig:traffic-pattern-throughput}]{\includegraphics[width=0.33\textwidth]{image/SUMO_PACKETSRE/Stations401}}
+  \caption{Influence of number of RAW group duration and slot number on successfully transmitted packets for different number of stations 
+  \textcolor{red}{"The throughput of one beacon interval represents the successfully transmitted packets in one beacon interval ", "The results of 20 slots seem weird, i will check later"}\label{fig:sumo-packetNum}}
+\end{figure*}
+
+\begin{table*}[t]
+\centering
+\begin{threeparttable}
+\caption{Variables and notations introduced in the algorithm description \label{tab:variables}}
+\begin{tabular}{lr}
+\hline
+\textbf{General variables}           & \textbf{Description}  \\
+\hline
+$\mathcal{BI}$           & Beacon interval \\
+$\mathcal{S}$            & Set of all stations\\
+\hline
+\textbf{Variables  of beacon interval $b$} & \textbf{Description}  \\
+\hline
+$\mathcal{K}^b$         & Set of clusters in beacon interval $b$ \\
+$\pi^b$                 & Number of packet transmissions in beacon interval $b$ \\
+\textbf{Variables  of cluster  $k \in \mathcal{K}^b$ } & \textbf{Description}  \\
+\hline
+$\mathcal{R}^k$         & Set of RAW groups in cluster $k$ \\
+$t^k_{int}$   & Transmission interval of cluster $k$\\
+\hline
+\textbf{Variables  of RAW group $r \in \mathcal{R}^b$ and Cluster  $k \in \mathcal{K}^b$}  & \textbf{Description}  \\
+\hline
+$\mathcal{S}^r$         & Set of stations assigned to RAW group $r$\\
+$\mathcal{D}^r_\textit{opt}$         & Optimal duration of RAW group $r$\\
+$\mathcal{SL}^r_\textit{opt}$         & Optimal slot number of RAW group $r$\\
+$\pi^r_\textit{opt}$ & Optimal number of packets successfully transmitted of RAW group $r$ \\
+$\pi^r$  & Number of packets successfully transmitted of RAW group $r$ \\
+%$t^r_\textit{count}$    & RAW slot duration count\\
+% \hline
+% \textbf{Variables  of station $s \in \mathcal{S}$} & \textbf{Description}  \\
+% \hline
+% $t^s_\textit{int}$            & Estimated transmission interval$^\star$ \\
+% $\pi^s_{b,r}$                 & Number of packets received by the AP in RAW slot $r$ of beacon interval $b$ from station $s$ \\
+% $\pi^s_\textit{failed}$                & Number of consecutive failed transmissions of station $S^i$ \\
+% $t^s_\textit{next}$                 & Estimated next transmission time$^\star$ \\
+% $t^s_\textit{int}$            & Estimated transmission interval$^\star$ \\
+% $\hat{t}^s_\textit{int}$            & Real transmission interval$^\star$ \\
+% $t^s_\textit{succ}\left[0\right]$	& Last successful transmission time$^\star$ \\
+% $t^s_\textit{succ}\left[1\right]$    & Previous to last successful transmission time$^\star$ \\
+% $\pi^s_\textit{trans}\left[0\right]$          & Last transmission result, success or failure \\
+% $\pi^s_\textit{trans}\left[1\right]$          & Previous to last transmission result, success or failure \\
+\hline
+\end{tabular}
+%  \begin{tablenotes}
+%       \small
+%       \item[$\star$] Expressed as a multiple of number of beacon intervals.
+%     \end{tablenotes}
+\end{threeparttable}
+\end{table*}
+
+
+%By comparing figure ~\ref{fig:sumo-throughput} and \ref{fig:sumo-packetNum}, we can find the high throughput in figure~\ref{fig:sumo-throughput} does not always result in large number of successfully transmitted packets.
+
+% * <le.tian@uantwerpen.be> 2017-11-24T09:58:11.070Z:
+%
+% ^.
+
+Simulation  1:
+
+$N$ stations are estimated to have packets to send, how to optimize? (assume sequential AID requirement can be met.) 
+
+Assume $m$ ($m=N$?) packet are estimated to be send.
+
+\begin{equation}
+\pi = f(\mathcal{S}^r, \mathcal{D}^r, \mathcal{SL}^r)
+\end{equation}
+
+Optimization, option:\\
+1, Use Number of received as an objective. Choose the max $\pi$. \\
+2, Use $T$ = $\pi$ / $\mathcal{D}^r$ as an objective. Choose the max $T$.\\
+3, use both Number of received and throughput.\\
+Choose $T^r > m$, then further choose max $Tr$
+
+4.multiple RAW group.
+%Choose max $T^r$, calculate the corresponding $\pi^r$. compare $m$ and $\pi^r$
+
+Objective: $\pi$ and $T$
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+% \begin{equation}
+% \max \sum_{r \in \mathcal{R}^b}  f_1(\mathcal{S}^{r_1}, \mathcal{D}^{r_1}, \mathcal{SL}^{r_1}) + f_2(\mathcal{S}^{r_1}, \mathcal{D}^{r_1}, \mathcal{SL}^{r_1}) \\
+% \end{equation}
+
+\begin{equation}
+\min \sum_{r \in \mathcal{R}^b}   \mathcal{D}^{r_1} + \mathcal{D}^{r_2} \\
+\end{equation}
+
+
+Subject to
+\begin{equation}
+\sum_{r \in R^b} \mathcal{D}^r \leq BI
+\end{equation}
+
+\begin{equation}
+   f_1(\mathcal{S}^{r_1}, \mathcal{D}^{r_1}, \mathcal{SL}^{r_1}) \geq {T}^{r_1} \\
+\end{equation}
+
+\begin{equation}
+   f_2(\mathcal{S}^{r_2}, \mathcal{D}^{r_2}, \mathcal{SL}^{r_2}) \geq {T}^{r_2} \\
+\end{equation}
+
+or \\
+
+
+
+ \begin{equation}
+ \max p_1 + p_2 \\
+ \end{equation}
+ 
+ 
+ Subject to
+\begin{equation}
+\sum_{r \in R^b} \mathcal{D}^r \leq BI
+\end{equation}
+
+\begin{equation}
+  p_1 = \min \{ f_1(\mathcal{S}^{r_1}, \mathcal{D}^{r_1}, \mathcal{SL}^{r_1}) / {T}^{r_1}, 1 \}  \\
+\end{equation}
+
+\begin{equation}
+  p_2 = \min \{ f_2(\mathcal{S}^{r_1}, \mathcal{D}^{r_1}, \mathcal{SL}^{r_1}) / {T}^{r_2}, 1  \}  \\
+\end{equation}
+
+or \\
+
+ \begin{equation}
+ \mathcal {\max} \min \{ \eta_1, \eta_2 \} \\
+ \end{equation}
+ 
+Subject to
+ 
+\begin{equation}
+\mathcal{S}_1^r \leq S_1
+\end{equation}
+
+\begin{equation}
+\mathcal{S}_2^r \leq S_2
+\end{equation}
+
+\begin{equation}
+ f_1(\mathcal{S}^{r_1}, \mathcal{D}^{r_1}, \mathcal{SL}^{r_1}) >= {T}^{S^{r_1}}
+\end{equation}
+
+\begin{equation}
+ f_2(\mathcal{S}^{r_2}, \mathcal{D}^{r_2}, \mathcal{SL}^{r_2}) >= {T}^{S^{r_2}}
+\end{equation}
+
+
+\begin{equation}
+\mathcal{D}^{r_1} + \mathcal{D}^{r_2} \leq BI
+\end{equation}
+
+\begin{equation}
+\eta_1 = \mathcal{S}_1^r / S_1
+\end{equation}
+
+\begin{equation}
+\eta_2 = \mathcal{S}_2^r / S_2
+\end{equation}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 

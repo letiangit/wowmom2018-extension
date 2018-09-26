@@ -1,0 +1,75 @@
+\section{Model-Based RAW Optimization Algorithm \label{sec:algorithm}}
+
+This section introduces the \glsreset{moroa}\gls{moroa}. It relies on the same principles as our previously proposed \gls{raw} optimization solutions \gls{taroa}~\cite{Sensor2017} and \gls{etaroa}~\cite{Sensys2017}. As such, it is also traffic-aware and able to adapt to changing traffic conditions. In contrast to previous work, \gls{moroa} differentiates in using a model to find the optimal \gls{raw} configuration parameters. This allows it to better estimate the actual performance of a specific \gls{raw} configuration. Moreover, \gls{moroa} supports heterogeneous stations with variable \gls{mcs} and packet size.
+
+% This section introduces the RAW optimization problem addressed in this article, and subsequently proposes the Traffic-Adaptive RAW Optimization Algorithm (TAROA). TAROA solves the RAW optimization problem in real-time, and is able to instantaneously adapt to changes in station association and traffic demand. Table~\ref{tab:variables} provides an overview of the variables used in the description of the RAW optimization problem and TAROA.
+
+
+\subsection{Overview}
+As in Section~\ref{sec:SUMO}, we assume an \gls{iot} sensor-based monitoring scenario. However, in contrast to the model presented above, the algorithm is able to handle heterogeneous stations, with variable transmission intervals, \gls{mcs}, and packet sizes. This is achieved, on one hand, by combining different trained models for different types of stations, and on the other hand, by transforming the performance metric output based on traffic conditions. Moreover, the data transmission interval of sensor stations can change over time (e.g., when an environmental event triggers a change in the sensor measurement interval). The goal of \gls{raw} optimization is to assign stations to a set of \gls{raw} groups with appropriate \gls{raw} parameter configurations, in order to achieve the required objective (e.g., maximum throughput, fairness, or minimum latency).  
+
+The proposed algorithm uses only information readily available at the \gls{ap}. The concrete steps are illustrated in Figure~\ref{fig:algorithm}. First, the \gls{ap} categorizes stations into different groups. In \gls{moroa}, this is based on \gls{mcs} and packet size, as these two factors influence the minimum time needed to successfully transmit a packet, and therefore the optimal slot duration. However, other grouping strategies can be used as well. Second, the \gls{ap} determines the traffic of each station, and selects the stations that are expected to have pending packets to transmit in the next beacon interval. As this information is not readily available to the \gls{ap}, it has to be estimated. We apply a traffic estimation method for \gls{iot} sensor traffic proposed in our previous work~\cite{Sensys2017}. Finally, we utilize a \gls{raw} performance model function $\mathcal{F}\left(n, d, s\right)$ that takes as input the number of stations $n$, the group duration $d$, and the number of slots $s$, and gives as output some performance metric $t$ (e.g., throughput). This function serves as the basis for an optimization problem that optimizes the \gls{raw} parameter decision variables $n$, $d$ and $s$, in order to maximize the selected performance metric. The output of the algorithm is a \gls{raw} configuration consisting of a set of groups, containing for each group a set of assigned stations, group duration, and the number of slots.
+
+Note that in the remainder of the description, we assume the use of the surrogate model described in Section~\ref{sec:SUMO}. However, any function $\mathcal{F}\left(n, d, s\right)$ that satisfies the above requirements and that can be calculated in real-time could be used in combination with \gls{moroa}. 
+
+
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.7\columnwidth]{image/sumo-alg3.pdf}
+  \caption{Overview of \gls{moroa}.\label{fig:algorithm}}
+\end{figure}
+
+
+\subsection{\gls{raw} parameter optimization with heterogeneous stations}
+
+We assume a set of stations $\mathcal{N}$ associated with the \gls{ap}. At the start of each beacon interval $b$, stations are split into $k$ distinct clusters, with each cluster $i \in \left[1, k\right]$ consisting of the stations $\mathcal{N}_i \subseteq \mathcal{N}$. This can be achieved using any clustering algorithm, based on a variety of distance metrics. We use standard K-means clustering combined with the packet transmission time as a distance metric. The packet transmission time can be trivially calculated based on \gls{mcs} and packet size, both of which can be monitored at the \gls{ap}. This results in stations with the same \gls{mcs} and average packet size to be clustered together, which is an assumption of our current surrogate model. %\todo{Same packet size is used in our training}. 
+In future work, we plan to train models without this assumption, allowing a wider variety of clustering approaches.
+
+Subsequently, by taking the fairness into account, the \gls{ap} determines which stations $\mathcal{N}_i^b \subseteq \mathcal{N}_i$ of each cluster $i$ are predicted to have packets queued for transmission during the next beacon interval $b$. This can be done using our previously proposed traffic estimation method for IEEE~802.11ah~\cite{Sensys2017}. We also define $n_i^b = \left|\mathcal{N}_i^b\right|$ as the number of stations in cluster $i$ predicted to have packets queued for transmission during the next beacon interval $b$. Finally, the algorithm assigns a \gls{raw} group to each cluster $i$. It calculates the number of stations $n_i$ that will be allowed to access the channel, the duration $d_i$ of the group, and in how many slots $s_i$ to split the group. Finding the \gls{raw} parameter values that maximize the chosen performance metric can be formulated as an optimization problem. This problem has to be solved jointly for all groups, as the chosen duration $d_i$ of a cluster $i$ influences the maximum duration of all other groups (i.e., the sum of all group durations should not be higher than the beacon interval duration $d_b$).
+
+As stated in Section~\ref{sec:SUMO}, a variety of objective functions can be defined, as the model can be trivially trained for a variety of metrics such as throughput, latency, energy consumption, and packet loss. As an illustration, we define an objective function that maximizes throughput as well as fairness across groups in terms of packets delivery ratio. The packet delivery ratio is defined as the ratio  between the total number of packets that are successfully received and the total number of packets generated.
+However, other objectives such as airtime fairness, latency minimization, or energy efficiency can easily be defined as well. The problem can be formulated as follows:
+\begin{equation} \label{eq:objective}
+\max \left( \alpha \times \mathcal{Q}_p + \left(1 - \alpha \right) \times \mathcal{Q}_f \right)
+\end{equation}
+With:
+\begin{equation} \label{eq:objectiveT}
+\mathcal{Q}_p =  \sum\limits_{i=1}^{k}  \frac{\mathcal{F}_t\left(n_i, d_i, s_i\right)}{n_i^b \times l_i}
+\end{equation}
+And
+\begin{equation} \label{eq:objectiveF}
+\mathcal{Q}_f =  \min_{i \in \left[1, k\right]} \left(  \frac{ \mathcal{F}_t (n_i, d_i, s_i) }{n_i^b \times l_i}  \right)
+\end{equation}
+Subject to:
+\begin{equation} \label{eq:si}
+\forall i \in \left[1,k\right]: n_i \leq n_i^{b}
+\end{equation}
+\begin{equation} \label{eq:sslot}
+ \sum\limits_{i=1}^{k} d_i \leq d_b
+\end{equation}
+\begin{equation} \label{eq:successpro}
+ %\mathcal{F}_t \left(n_i, d_i, s_i\right)} {n_i \times l_i}
+\forall i \in \left[1,k\right]:  p_i^s < \frac{ n_i \times l_i}{\mathcal{F}_t \left( n_i, d_i, s_i\right)}
+\end{equation}
+Where $\mathcal{F}_t\left(\cdot\right)$ represents the \gls{raw} model function that calculates throughput. The variable $l_i$ is the average packet size of stations in cluster $i$. The continuous variable $\alpha \in \left[0, 1\right]$ is a weight used to define the relative importance of both sub-objectives. The parameter $d_b$ represents the duration of the beacon interval $b$. In Eq.~\ref{eq:successpro}, $p_i^s$ represents the successful packet transmission probability of \gls{raw} group $i$. This constraint is required, as the traffic estimation method we use, does not work properly under high packet loss due to contention~\cite{Sensor2017}. As such, we use $p_i^s=0.99$. When using other traffic estimation methods, this constraint may not be needed.
+
+${Q}_f$ represents the fairness objective, while ${Q}_p$ represents throughput. Both objectives are normalized as to align their valid value range and simplify selection of $\alpha$. Note that this formulation assumes that stations will only attempt to transmit one packet per beacon interval. This assumption generally holds for sensor scenarios, where the throughput of individual stations is low~\cite{Khorov2015b}. In reality, some stations may have multiple packets queued, especially when the traffic estimator is still learning~\cite{Sensys2017}. However, this has a negligible effect on performance of the algorithm over longer periods. Currently, \gls{moroa} does not consider the required sequentiality of \glspl{aid} in the \gls{rps} element, as we consider \gls{aid} reassignment a separate issue left for future work.
+
+%\textcolor{red}{For the moment, we slightly modify the RPS element to assign stations to the same RAW group without the sequential AID constraint, AID dynamic re-assignment is considered future work to fully stick to the 802.11ah requirement.}
+%To be able to assign modifying the PS-Poll frame structure in the 802.11ah standard Since only stations with sequential AID can be assigned to the same group, AID re-assignment to further optimize latency as well as throughput is considered future work.}
+The formulated problem is a non-linear constrained optimization problem with integer decision variables (i.e., $n_i$, $d_i$, and $s_i$). This can for example be solved using genetic algorithms. A relaxed version of the problem with continuous decision variables could alternatively be solved using for example the Interior-Point method, in combination with a rounding strategy to convert the resulting continuous decision variable values to integers. Moreover, by taking the characteristic 802.11ah into account, the value of $n_i$ and $k$ can be further limited, reducing the number of potential solutions and therefore the solving time. The sum of $n_i$ for all the RAW groups is limited to the maximum number of packet $n_{max}^b$ that can be successfully transmitted during one beacon interval. Due to the relatively low data rates supported by 802.11ah (i.e., up to 7.8~Mbps for a 2~MHz bandwidth), $n_{max}^b$ ranges from around $10$ to $100$ in practice. The number of groups $k$ cannot be higher than 42, as the maximum size of the \gls{rps} elements is $256$~bytes and at least $6$~bytes are needed per group. Based on the specification of \gls{raw}, the parameter $s_i$ is at most 64 and $d_i$ is at most $1990.4$~ms.
+
+
+%\textcolor{red}{TODO: we should give some indication that solving the problem is fast, as the values that $n_i$ and $s_i$ can take that would lead to good results are limited. Can we show this using some calculation?}
+
+%Where $\mathcal{F}_i(\cdot)$ represents the built RAW model for type $i$ stations. $L_i$ denotes the packet length of stations assigned to group $i$, $\mathcal{P}_i(\cdot)$ calculates the estimated traffic load of RAW group $i$ based on the consumption that the station is estimated to has one packet when it is assigned to a RAW group. This consumption generally holds given the sensor use case considered in this paper, a station will at most transmit one packet per beacon interval (generally set to 200 ms). Although during the learning phase of traffic estimation, more than one packet may be accumulated at the transmission queue of the station, this can be well solved via again assigning the station to a RAW group in the next beacon interval by utilizing the ''more data" filed, more details can be found in the E-TAROA algorithm \cite{Sensys2017}. Eq. (\ref{eq:objectiveT}) aims for the normalized throughput of the network, while Eq. (\ref{eq:objectiveF}) targets at the fairness among different types of stations in terms of the percentage of traffic that can be delivered to the AP. Straightforwardly, the stations assigned to RAW group should not be larger than the maximal number of station having packets to send, as indicated in Eq. (\ref{eq:si}), $s_i < s_i^{max}$ occurs  the network is under the overloaded traffic condition. Since there is no overlap between different different RAW groups, as Eq \ref{eq:sslot} suggests, the total RAW duration should not exceed beacon interval $B$. The objective function Eq. (\ref{eq:objective}) is adjustable by tuning the value of $\alpha$, a larger $\alpha$ indicates the throughput is more important in the evaluated scenarios, a smaller $\alpha$ can be used when fairness has the high priority.
+
+%The RAW optimization is an integer linear programming (ILP) problem, which can be solved online or offline. The online method is suitable for the small scale network(i.e., a few station types and station number stations), since there is a very limited time available before the  AP sends the beacon frame carrying RAW configuration information. For offline, the optimal RAW configuration can be calculated in advance for all the possible combination $\{ n_1^{B}, n_2^{B}, \cdot, n_n^{B} \}$. With the pre-calculated RAW configuration, the AP is able to estimate the traffic of stations and group the stations in an optimal way in a very short time. 
+
+
+
+
+
+
+
