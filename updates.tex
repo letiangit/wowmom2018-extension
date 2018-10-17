@@ -1,0 +1,253 @@
+\documentclass[review]{elsarticle}
+
+\usepackage{lineno,hyperref}
+\modulolinenumbers[5]
+
+\journal{Journal of \LaTeX\ Templates}
+
+%%%%%%%%%%%%%%%%%%%%%%%
+%% Elsevier bibliography styles
+%%%%%%%%%%%%%%%%%%%%%%%
+%% To change the style, put a % in front of the second line of the current style and
+%% remove the % from the second line of the style you would like to use.
+%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Numbered
+%\bibliographystyle{model1-num-names}
+
+%% Numbered without titles
+%\bibliographystyle{model1a-num-names}
+
+%% Harvard
+%\bibliographystyle{model2-names.bst}\biboptions{authoryear}
+
+%% Vancouver numbered
+%\usepackage{numcompress}\bibliographystyle{model3-num-names}
+
+%% Vancouver name/year
+%\usepackage{numcompress}\bibliographystyle{model4-names}\biboptions{authoryear}
+
+%% APA style
+%\bibliographystyle{model5-names}\biboptions{authoryear}
+
+%% AMA style
+%\usepackage{numcompress}\bibliographystyle{model6-num-names}
+
+%% `Elsevier LaTeX' style
+\bibliographystyle{elsarticle-num}
+
+\usepackage[pdftex]{graphicx}
+%\usepackage[caption=false,font=footnotesize]{subfig}
+%\usepackage{url}
+%\usepackage{multirow}
+%\usepackage{subfigure}
+%\usepackage{caption}
+\usepackage[caption=false]{subfig}
+\usepackage{multicol}
+\usepackage{amsmath}
+\usepackage{color}
+\usepackage{balance}
+%\usepackage{hyperref}
+%\setlength{\textfloatsep}{5pt}
+
+\usepackage{algorithmic}
+\usepackage{pseudocode}
+\usepackage[linesnumbered,vlined,ruled]{algorithm2e}
+\usepackage{threeparttable}
+\usepackage{comment}
+\usepackage{todonotes}
+\usepackage{tabu}
+\usepackage[justification=centering]{caption}
+\usepackage{soul}
+\usepackage{adjustbox}
+\usepackage{commath}
+\usepackage[acronym]{glossaries}
+
+%\usepackage{mathptmx}
+%\DeclareCaptionFont{xipt}{\fontsize{11}{13}\mdseries}
+%\usepackage[font=xipt,labelfont=bf]{caption}
+%\usepackage[font=times]{caption}
+%\usepackage[font=rm]{caption}
+
+% \newfontfamily{\ubuntufont}{Times NeW Roman}
+% \DeclareCaptionFont{ubuntu}{\ubuntufont}
+\usepackage[font={footnotesize}]{caption}
+%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\begin{frontmatter}
+
+
+\title{IEEE~802.11ah Restricted Access Window Surrogate Model for Real-Time Station Grouping}
+
+
+
+% \title{Elsevier \LaTeX\ template\tnoteref{mytitlenote}}
+% \tnotetext[mytitlenote]{Fully documented templates are available in the elsarticle package on \href{http://www.ctan.org/tex-archive/macros/latex/contrib/elsarticle}{CTAN}.
+% }
+
+%% Group authors per affiliation:
+% \author{\IEEEauthorblockN{Le~Tian\IEEEauthorrefmark{1}, Michael~Mehari\IEEEauthorrefmark{2}, Serena~Santi\IEEEauthorrefmark{1}, Steven~Latr\'e\IEEEauthorrefmark{1}\IEEEauthorrefmark{2},\\ Eli~De~Poorter\IEEEauthorrefmark{2}, Jeroen Famaey\IEEEauthorrefmark{1}}
+% \IEEEauthorblockA{\IEEEauthorrefmark{1}University of Antwerp - imec, IDLab, Department of Mathematics and Computer Science, Belgium}
+% \IEEEauthorblockA{\IEEEauthorrefmark{2}Ghent University - imec, IDLab, Department of Information Technology, Belgium}}
+\author[1]{Le Tian}
+\ead{le.tian@uantwerpen.be}
+
+\author[2]{Michael~Mehari}
+\ead{michael.mehari@ugent.be}
+
+\author[1]{Serena~Santi}
+\ead{Serena.Santi@uantwerpen.be}
+
+\author[1,2]{Steven~Latr\'e}
+\ead{Steven.Latre@uantwerpen.be}
+
+\author[2]{Eli~De~Poorte}
+\ead{eli.depoorter@ugent.be}
+
+\author[1]{Jeroen Famaey }
+\ead{jeroen.famaey@uantwerpen.be}
+
+
+\address[1]{University of Antwerp - imec, IDLab, Department of Mathematics and Computer Science, Belgium}
+\address[2]{Ghent University - imec, IDLab, Department of Information Technology, Belgium}
+%\fntext[myfootnote]{Since 1880.}
+
+%% or include affiliations in footnotes:
+% \author[mymainaddress,mysecondaryaddress]{Elsevier Inc}
+% \ead[url]{www.elsevier.com}
+
+% \author[mysecondaryaddress]{Global Customer Service\corref{mycorrespondingauthor}}
+% \cortext[mycorrespondingauthor]{Corresponding author}
+% \ead{support@elsevier.com}
+
+%\address[mymainaddress]{1600 John F Kennedy Boulevard, Philadelphia}
+%\address[mysecondaryaddress]{360 Park Avenue South, New York}
+
+\input{glossary}
+
+%\maketitle
+
+\begin{abstract}
+
+
+\end{abstract}
+
+\begin{keyword}
+\texttt{elsarticle.cls}
+
+\end{keyword}
+
+\end{frontmatter}
+
+\linenumbers
+
+\glsresetall
+
+\textbf{Update} 
+\begin{enumerate}
+\item Add energy consumption model.
+\item Update the way of showing performance comparison. 
+\item Show Pareto front.
+    \begin{enumerate}
+    \item For One type of stations ? or two types of stations together? With or without constraint?
+    \item For all configurations (rd, slot, nsta), or certain  parameter is fixed.
+    \end{enumerate}
+\item Explore optimized \gls{raw} configuration for homogeneous stations.
+%\item Algorithm for homogeneous stations update? No
+\item Algorithm for heterogeneous stations update? 
+    \begin{enumerate}
+    \item reformulate the objective and constraint?
+    \end{enumerate}
+\item Homogeneous stations results comparison.
+    \begin{enumerate}
+    %\item \gls{etaroa} estimates the number of stations having packets to send, and assign one RAW slot for one station. It uses all the channel time. 
+    %\item \gls{moroa} estimates the number of stations having packets to send, and assign them based on the criteria (throughput, energy, or both) using the surrogate RAW mode. From surrogate model, it says, throughput is likely linked to large rd and medium slot number, and energy is likely linked to large rd and large slot.
+    \item Throughout comparison between \gls{etaroa} and \gls{moroa} with maximizing throughput.
+    \item Energy comparison between \gls{etaroa} and \gls{moroa} with minimizing energy.
+     \item Throughput and energy comparison between \gls{etaroa} and \gls{moroa} with balancing throughput and energy.
+    \end{enumerate}
+\item Heterogeneous stations results comparison.
+
+\end{enumerate}
+
+
+%\textcolor{red}{solution can be reached with the aid of specific parameters of the scalarization.}
+
+%\textcolor{red}{but the right choice of the objective function has a much more grave impact than the specific choice of the optimization algorithm.}
+
+The problem can be formulated as follows: \\
+      \textbf{Pareto front for objectives}: \\
+Calculate the Pareto front of heterogeneous station requires much more computations. For one type of station, there is only 163840 points, where for the mixture of two types of stations, there are $163840 \times 163840 =  2.68435456 \times 10^{10}$ points without take the constraint $ \sum\limits_{i=1}^{k} d_i \leq d_b
+$ into account. The number of points is $163840 ^ n$, where $n$ is the number of stations type. \textbf{Objective:} \\
+\begin{equation} \label{eq:objective}
+\forall i \in \left[1,k\right]: \max T_i, \min E_i, 
+\end{equation}
+With:
+\begin{equation} \label{eq:objectiveT}
+\mathcal{T}_i =    \frac{\mathcal{F}_t\left(n_i, d_i, s_i\right)}{n_i^b \times l_i}
+\end{equation}
+
+\begin{equation} \label{eq:objectiveT}
+\mathcal{E}_i =    \frac{\mathcal{F}_e\left(n_i, d_i, s_i\right)}{n_i^b \times l_i}
+\end{equation}
+Subject to:
+\begin{equation} \label{eq:si}
+\forall i \in \left[1,k\right]: n_i \leq n_i^{b}
+\end{equation}
+\begin{equation} \label{eq:sslot}
+ \sum\limits_{i=1}^{k} d_i \leq d_b
+\end{equation}
+\begin{equation} \label{eq:successpro}
+ %\mathcal{F}_t \left(n_i, d_i, s_i\right)} {n_i \times l_i}
+\forall i \in \left[1,k\right]:  p_i^s < \frac{ n_i \times l_i}{\mathcal{F}_t \left( n_i, d_i, s_i\right)}
+\end{equation}
+
+
+\textbf{One type of station}, Objective 
+\begin{equation} \label{eq:objective}
+\max T, \min E
+\end{equation}
+with 
+\begin{equation} \label{eq:objectiveT}
+\mathcal{T} =    \mathcal{F}_t\left(n_i, d_i, s_i\right)
+\end{equation}
+\begin{equation} \label{eq:objectiveT}
+\mathcal{E} =    \mathcal{F}_e\left(n_i, d_i, s_i\right)
+\end{equation}
+Subject to:
+\begin{equation} \label{eq:si}
+\forall i \in \left[1,k\right]: n_i \leq n_i^{b}
+\end{equation}
+\begin{equation} \label{eq:sslot}
+ \sum\limits_{i=1}^{k} d_i \leq d_b
+\end{equation}
+\begin{equation} \label{eq:successpro}
+ %\mathcal{F}_t \left(n_i, d_i, s_i\right)} {n_i \times l_i}
+\forall i \in \left[1,k\right]:  p_i^s < \frac{ n_i \times l_i}{\mathcal{F}_t \left( n_i, d_i, s_i\right)}
+\end{equation}
+This results in a pareto front. \\
+
+
+The estimated throughout shouldn't be higher than the input traffic load.
+
+
+For the station number on the edge (i.e., all packet can get through with proper \gls{raw} configuration), choose the corresponding \gls{raw} configuration. \\
+
+For the station number above the edge (i.e., all packet \textb{cannot} get through with proper \gls{raw} configuration), only allow part of the stations to send with proper \gls{raw} configuration to get all packet throughput. Always use the largest \gls{raw} duration, as it benefit both throughput and energy.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document}
