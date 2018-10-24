@@ -41,7 +41,9 @@ The modified controller conducts similar tasks as the original \gls{sumo} contro
 %cross validation score satisfies the threshold, or the maximum allowed training time has been reached.
 \end{enumerate}
 
-In our experiments, the SUMO toolbox is configured to use the latin hypercube sampling method~\cite{FAViana2013} to generate 100 initial sample data points, Kriging interpolation is used to train the model~\cite{JMLRv15couckuyt14a},  FLOLA-Voronoi sampling for generating the next sample points~\cite{van2015fuzzy}, and the 10-fold cross-validation with a \gls{rrse} measure to evaluate the model accuracy~\cite{van2016sensitivity}. The training stops once the cross-validation score lower than or equal to $0.10$ (2 digits of precision) occurs $10$ times in succession, or the number of training data points exceeds $2500$.
+
+In our experiments, the SUMO toolbox is configured to use the latin hypercube sampling method~\cite{FAViana2013} to generate 100 initial sample data points, Kriging interpolation is used to train the model~\cite{JMLRv15couckuyt14a},  FLOLA-Voronoi sampling for generating the next sample points~\cite{van2015fuzzy}, and the 10-fold cross-validation with a \gls{rrse} measure to evaluate the model accuracy~\cite{van2016sensitivity}. The training stops once the cross-validation score lower than or equal to $0.10$ (2 digits of precision) occurs $10$ times in succession, or the number of training data points exceeds $2500$. \todo{extend}
+
 
 
 \subsection{Training scenario}
@@ -128,7 +130,7 @@ ${l}_r$         & RAW slot number of group $r$ \\
 \end{comment}
 
 
-\subsection{Input parameters for RAW modeling}
+\subsection{Input and output parameters for RAW modeling}
 
 % In order to build the surrogate model, a representative set of data samples must be collected to build a model with sufficient accuracy.
 % Data samples are collected in such a way that the model
@@ -144,6 +146,13 @@ t_r = \mathcal{F}(n_r, d_r, s_r)
 \end{equation}
 In addition to throughput, the simulator calculates a variety of other performance metrics, such as packet loss, latency and energy consumption. As such, the same methodology as described here can be used to train a model for predicting these other performance metrics. However, to simplify the explanation, we focus on throughput.
 
+
+The goal is to build a surrogate model that can accurately predict the performance of a heterogeneous 802.11ah network for the given \gls{raw} settings and  network conditions. Therefore, a set of parameters should be defined to represent the \gls{raw} configuration and network conditions,  and used as the input parameters of the surrogate model. 
+
+Moreover, the input parameter space needs to be defined, which consists of the minimum and maximum value of each parameter, as well as a step size. A data point in the surrogate model represents a certain parameter values combination, and is referred to as a certain heterogeneous 802.11ah network in our surrogate modelling. Surrogate model is designed to accurately represent the system behavior with only a limited number of data points of the input parameter space. Therefore, the parameters and their step sizes should be well chosen, leveraging the trade-off between accuracy and training speed. On the one hand, a small number of parameters and large step sizes lead to a small design space, which needs less training time but poorly characterizes the system. On the other hand, a large number of parameters and small step sizes result in a big design space, which can more accurately characterize the system but needs more training time. As for the output parameter of the model, it should be able to represent the performance metrics (e.g., throughput, energy consumption and latency) with the given input parameters. To simplify the explanation, we focus on throughput as an output metric.
+
+
+\subsubsection{Input parameters design}
 To build the \gls{sumo} model, the input parameter space needs to be defined. It consists of the minimum and maximum value of each parameter, as well as a step size. The minimum and maximum can be determined based on expert knowledge of \gls{raw} performance, as well as legal values defined by the IEEE~802.11ah standard. The range of the number of stations $n_r$ in a \gls{raw} group should span from low to high traffic conditions, so the trained model gives accurate results independent of the density. From our previous studies on \gls{raw} performance~\cite{WoWMoM2016}, and based on the parameters listed in Table~\ref{tab:ns3 parameters}, a minimum value of $60$ and maximum value of $400$ stations per group were deemed to cover all possible traffic conditions. The RAW group duration should be large enough to send at least 1 packet successfully, and at most equal to the duration of the beacon intervals. As such, $d_r$ is varied between $40960$~$\mu$s and $204800$~$\mu$s. The number of slots $s_r$ is bound between $1$ and $64$, as per the IEEE standard. However, a very high number of slots leaves not enough time within a slot to successfully transmit a packet. As such, we limit $s_r$ between 1 and 50.
 
 The actual step size of $n_r$ and $s_r$ is $1$, as they are integer variables. The parameter $d_r$ has a step size of $120$~$\mu$s, as defined in the 802.11ah standard. This results in a total input space of $2.3 \times 10^7$ possible data points. This is too high to properly train the model in a feasible amount of time. To alleviate this, we experimentally determined a good step size for each of the three parameters, leveraging the trade-off between accuracy and training speed. For $n_r$ and $s_r$ a step size of 5 was selected. It was found that the \gls{raw} duration $d_r$ has a high sensitivity. As such, a small value of $5120$~$\mu$s was chosen as its step size. This results in a significantly reduced input space of $25047$ data points. Table~\ref{tab:sumo parameters} summarizes the selected input parameter space. Note that a slot count $s_r$ equal to $0$ is not legal, and $s_r$ therefore takes on values from the set $\left\{1, 5, 10, ..., 50\right\}$. Results for data points outside the reduced input parameter space are obtained via linear interpolation of the two nearest data points included in the model.
@@ -166,3 +175,11 @@ $s_r$           & 1 & 5 & 50    \\
 \hline
 \end{tabular}
 \end{table}
+
+
+\subsubsection{Output parameters design}
+\textcolor{red}{
+As non-linear regions are more difficult to model compared to linear regions, thus more sample points in the non-linear regions are required in the modelling process. 
+Therefore, a good selection of output parameter, which leads to more linear regions, can speed up the modeling process. For our models, there are several options on the output parameters, which can directly or indirectly represent the performance metrics (i.e., throughput and energy) that we focus on.  As in our modeling process, \gls{raw} group duration may be short than the beacon interval, we can use the throughput of the \gls{raw} groups or the throughput of the whole beacon interval \gls{raw} as output parameter for throughput model. While the latter one results in more linear output than the former one does, since \gls{raw} group duration varies from data points to data points, and beacon interval is always constant. Similarly, energy consumption per packet or total energy consumption can be considered as output parameter for energy model. While the former one is the ratio between the latter one and the number of successfully transmitted packets, it leads to more more non-linear output than the latter one does. Therefore, we choose throughput of the whole beacon interval \gls{raw} and  total energy consumption as output parameters for throughput and energy model, respectively. 
+%For the surrogate modeling, Kriging and FLOLA-Voronoi are used for model creation and sampling strategy, respectively. Kriging assumes that data points are spatially correlated, such that points that closer will have comparable performance, i.e., the performance difference between two date points is smaller if they are closer to each other than far away points. A novel sampling strategy called FLOLA-Voronoi [27] isused to select the next design points to improve the modelaccuracy. The FLOLA approach is used for exploiting the non-linear regions, while the Voronoi approach exploresthe sparsely sampled regions, the scores from the FLOLAand  Voronoi  are  combined  to  decide  the  next  samplepoint. In our experiments, 10 new data points are pickedin each interation
+}

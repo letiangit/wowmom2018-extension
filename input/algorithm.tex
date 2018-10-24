@@ -30,8 +30,9 @@ Subsequently, by taking the fairness into account, the \gls{ap} determines which
 
 As stated in Section~\ref{sec:SUMO}, a variety of objective functions can be defined, as the model can be trivially trained for a variety of metrics such as throughput, latency, energy consumption, and packet loss. As an illustration, we define an objective function that maximizes throughput as well as fairness across groups in terms of packets delivery ratio. The packet delivery ratio is defined as the ratio  between the total number of packets that are successfully received and the total number of packets generated.
 However, other objectives such as airtime fairness, latency minimization, or energy efficiency can easily be defined as well. The problem can be formulated as follows:
+\textcolor{red}{
 \begin{equation} \label{eq:objective}
-\max \left( \alpha \times \mathcal{Q}_p + \left(1 - \alpha \right) \times \mathcal{Q}_f \right)
+\max \left( \alpha \times \mathcal{Q}_p + \left(1 - \alpha \right) \times \mathcal{Q}_e \right)
 \end{equation}
 With:
 \begin{equation} \label{eq:objectiveT}
@@ -39,8 +40,10 @@ With:
 \end{equation}
 And
 \begin{equation} \label{eq:objectiveF}
-\mathcal{Q}_f =  \min_{i \in \left[1, k\right]} \left(  \frac{ \mathcal{F}_t (n_i, d_i, s_i) }{n_i^b \times l_i}  \right)
+%\mathcal{Q}_e =  \min_{i \in \left[1, k\right]} \left(  \frac{ \mathcal{F}_t (n_i, d_i, s_i) }{n_i^b \times l_i}  \right)
+\mathcal{Q}_e =  \sum \limits_{i=1}^{k}  \frac{\mathcal{F}_e\left(n_i, d_i, s_i\right)}{\mathcal{F}_t\left(n_i, d_i, s_i\right) \times E_i}
 \end{equation}
+}
 Subject to:
 \begin{equation} \label{eq:si}
 \forall i \in \left[1,k\right]: n_i \leq n_i^{b}
@@ -59,6 +62,45 @@ ${Q}_f$ represents the fairness objective, while ${Q}_p$ represents throughput. 
 %\textcolor{red}{For the moment, we slightly modify the RPS element to assign stations to the same RAW group without the sequential AID constraint, AID dynamic re-assignment is considered future work to fully stick to the 802.11ah requirement.}
 %To be able to assign modifying the PS-Poll frame structure in the 802.11ah standard Since only stations with sequential AID can be assigned to the same group, AID re-assignment to further optimize latency as well as throughput is considered future work.}
 The formulated problem is a non-linear constrained optimization problem with integer decision variables (i.e., $n_i$, $d_i$, and $s_i$). This can for example be solved using genetic algorithms. A relaxed version of the problem with continuous decision variables could alternatively be solved using for example the Interior-Point method, in combination with a rounding strategy to convert the resulting continuous decision variable values to integers. Moreover, by taking the characteristic 802.11ah into account, the value of $n_i$ and $k$ can be further limited, reducing the number of potential solutions and therefore the solving time. The sum of $n_i$ for all the RAW groups is limited to the maximum number of packet $n_{max}^b$ that can be successfully transmitted during one beacon interval. Due to the relatively low data rates supported by 802.11ah (i.e., up to 7.8~Mbps for a 2~MHz bandwidth), $n_{max}^b$ ranges from around $10$ to $100$ in practice. The number of groups $k$ cannot be higher than 42, as the maximum size of the \gls{rps} elements is $256$~bytes and at least $6$~bytes are needed per group. Based on the specification of \gls{raw}, the parameter $s_i$ is at most 64 and $d_i$ is at most $1990.4$~ms.
+
+% \subsection{\gls{raw} parameter optimization with heterogeneous stations}
+
+% We assume a set of stations $\mathcal{N}$ associated with the \gls{ap}. At the start of each beacon interval $b$, stations are split into $k$ distinct clusters, with each cluster $i \in \left[1, k\right]$ consisting of the stations $\mathcal{N}_i \subseteq \mathcal{N}$. This can be achieved using any clustering algorithm, based on a variety of distance metrics. We use standard K-means clustering combined with the packet transmission time as a distance metric. The packet transmission time can be trivially calculated based on \gls{mcs} and packet size, both of which can be monitored at the \gls{ap}. This results in stations with the same \gls{mcs} and average packet size to be clustered together, which is an assumption of our current surrogate model. %\todo{Same packet size is used in our training}. 
+% In future work, we plan to train models without this assumption, allowing a wider variety of clustering approaches.
+
+% Subsequently, by taking the fairness into account, the \gls{ap} determines which stations $\mathcal{N}_i^b \subseteq \mathcal{N}_i$ of each cluster $i$ are predicted to have packets queued for transmission during the next beacon interval $b$. This can be done using our previously proposed traffic estimation method for IEEE~802.11ah~\cite{Sensys2017}. We also define $n_i^b = \left|\mathcal{N}_i^b\right|$ as the number of stations in cluster $i$ predicted to have packets queued for transmission during the next beacon interval $b$. Finally, the algorithm assigns a \gls{raw} group to each cluster $i$. It calculates the number of stations $n_i$ that will be allowed to access the channel, the duration $d_i$ of the group, and in how many slots $s_i$ to split the group. Finding the \gls{raw} parameter values that maximize the chosen performance metric can be formulated as an optimization problem. This problem has to be solved jointly for all groups, as the chosen duration $d_i$ of a cluster $i$ influences the maximum duration of all other groups (i.e., the sum of all group durations should not be higher than the beacon interval duration $d_b$).
+
+% As stated in Section~\ref{sec:SUMO}, a variety of objective functions can be defined, as the model can be trivially trained for a variety of metrics such as throughput, latency, energy consumption, and packet loss. As an illustration, we define an objective function that maximizes throughput as well as fairness across groups in terms of packets delivery ratio. The packet delivery ratio is defined as the ratio  between the total number of packets that are successfully received and the total number of packets generated.
+% However, other objectives such as airtime fairness, latency minimization, or energy efficiency can easily be defined as well. The problem can be formulated as follows:
+% \begin{equation} \label{eq:objective}
+% \max \left( \alpha \times \mathcal{Q}_p + \left(1 - \alpha \right) \times \mathcal{Q}_f \right)
+% \end{equation}
+% With:
+% \begin{equation} \label{eq:objectiveT}
+% \mathcal{Q}_p =  \sum\limits_{i=1}^{k}  \frac{\mathcal{F}_t\left(n_i, d_i, s_i\right)}{n_i^b \times l_i}
+% \end{equation}
+% And
+% \begin{equation} \label{eq:objectiveF}
+% \mathcal{Q}_f =  \min_{i \in \left[1, k\right]} \left(  \frac{ \mathcal{F}_t (n_i, d_i, s_i) }{n_i^b \times l_i}  \right)
+% \end{equation}
+% Subject to:
+% \begin{equation} \label{eq:si}
+% \forall i \in \left[1,k\right]: n_i \leq n_i^{b}
+% \end{equation}
+% \begin{equation} \label{eq:sslot}
+%  \sum\limits_{i=1}^{k} d_i \leq d_b
+% \end{equation}
+% \begin{equation} \label{eq:successpro}
+%  %\mathcal{F}_t \left(n_i, d_i, s_i\right)} {n_i \times l_i}
+% \forall i \in \left[1,k\right]:  p_i^s < \frac{ n_i \times l_i}{\mathcal{F}_t \left( n_i, d_i, s_i\right)}
+% \end{equation}
+% Where $\mathcal{F}_t\left(\cdot\right)$ represents the \gls{raw} model function that calculates throughput. The variable $l_i$ is the average packet size of stations in cluster $i$. The continuous variable $\alpha \in \left[0, 1\right]$ is a weight used to define the relative importance of both sub-objectives. The parameter $d_b$ represents the duration of the beacon interval $b$. In Eq.~\ref{eq:successpro}, $p_i^s$ represents the successful packet transmission probability of \gls{raw} group $i$. This constraint is required, as the traffic estimation method we use, does not work properly under high packet loss due to contention~\cite{Sensor2017}. As such, we use $p_i^s=0.99$. When using other traffic estimation methods, this constraint may not be needed.
+
+% ${Q}_f$ represents the fairness objective, while ${Q}_p$ represents throughput. Both objectives are normalized as to align their valid value range and simplify selection of $\alpha$. Note that this formulation assumes that stations will only attempt to transmit one packet per beacon interval. This assumption generally holds for sensor scenarios, where the throughput of individual stations is low~\cite{Khorov2015b}. In reality, some stations may have multiple packets queued, especially when the traffic estimator is still learning~\cite{Sensys2017}. However, this has a negligible effect on performance of the algorithm over longer periods. Currently, \gls{moroa} does not consider the required sequentiality of \glspl{aid} in the \gls{rps} element, as we consider \gls{aid} reassignment a separate issue left for future work.
+
+% %\textcolor{red}{For the moment, we slightly modify the RPS element to assign stations to the same RAW group without the sequential AID constraint, AID dynamic re-assignment is considered future work to fully stick to the 802.11ah requirement.}
+% %To be able to assign modifying the PS-Poll frame structure in the 802.11ah standard Since only stations with sequential AID can be assigned to the same group, AID re-assignment to further optimize latency as well as throughput is considered future work.}
+% The formulated problem is a non-linear constrained optimization problem with integer decision variables (i.e., $n_i$, $d_i$, and $s_i$). This can for example be solved using genetic algorithms. A relaxed version of the problem with continuous decision variables could alternatively be solved using for example the Interior-Point method, in combination with a rounding strategy to convert the resulting continuous decision variable values to integers. Moreover, by taking the characteristic 802.11ah into account, the value of $n_i$ and $k$ can be further limited, reducing the number of potential solutions and therefore the solving time. The sum of $n_i$ for all the RAW groups is limited to the maximum number of packet $n_{max}^b$ that can be successfully transmitted during one beacon interval. Due to the relatively low data rates supported by 802.11ah (i.e., up to 7.8~Mbps for a 2~MHz bandwidth), $n_{max}^b$ ranges from around $10$ to $100$ in practice. The number of groups $k$ cannot be higher than 42, as the maximum size of the \gls{rps} elements is $256$~bytes and at least $6$~bytes are needed per group. Based on the specification of \gls{raw}, the parameter $s_i$ is at most 64 and $d_i$ is at most $1990.4$~ms.
 
 
 %\textcolor{red}{TODO: we should give some indication that solving the problem is fast, as the values that $n_i$ and $s_i$ can take that would lead to good results are limited. Can we show this using some calculation?}
