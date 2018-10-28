@@ -49,13 +49,15 @@ Latency is defined as the average time between a packet entering the transmit qu
 \end{figure}
 
 In this section we evaluate the training convergence of the surrogate model, as well as its accuracy compared to simulation results. Figure~\ref{fig:sumo-iteraton} plots the model's cross validation score as a function of the number of training samples used. The cross validation score provides a measure for the accuracy of the resulting model. A consistently low score signifies that the training process has converged. Based on this graph, we can conclude that for both the model with high-throughput (HT) and low-throughput (LT) stations, convergence occurs after around $1700$ training samples have been used. The training of the HT model stopped after 2370 iterations as it satisfied the cross-validation stop conditions, i.e., 10 consecutive cross-validation scores lower than or equal to $0.10$ (2 digits of precision). The training of the LT model stopped after the maximum number of 2500 iterations, having only achieved 15 consecutive cross-validation scores between $0.11$ and $0.12$.
-This comes down to about $0.0074$\% of all data points in the input space (i.e., $2.3 \times 10^7$), and about $6.8$\% of the reduced data space (i.e., $25047$) from which samples were drawn during training.
+This comes down to about $0.0074$\% of all data points in the input space (i.e., $2.3 \times 10^7$), and about $6.8$\% of the reduced data space (i.e., $25047$) from which samples were drawn during training. \todo{add energy consumption model.}
 
 In order to ensure no over-fitting occurred, the surrogate model also provides accurate results for data points outside the reduced input space (cf. Table~\ref{tab:sumo parameters}), Figure~\ref{fig:sumo-test-data} plots the absolute error (in terms of throughput) of the surrogate model compared to simulation results. In total, 2070 random data points were generated from all $2.3 \times 10^7$ possible points. The figure also plots the actual simulated throughput of each point, to characterize the significance of the error. For the HT model, the absolute throughput estimation error stays below 0.02~Mbps for the first 2000 points (i.e., $96.6$\% of all data points). The absolute error only goes above $0.1$~Mbps for 3 data points (i.e., $0.14$\%). Similarly, for the LT model, the throughput estimation error stays below $0.004$~Mbps for the first 2000 data points, and only grows above $0.01$~Mbps for the worst 11 data points. In terms of the relative error (i.e., ratio between absolute throughput error and simulation results, not depicted) of the surrogate model compared to simulations, 95\% of all data points have an error below 6.6\% and 5.4\% for the HT and LT model respectively. For both models, 98\% of the data points have a relative error below 10\%. These results validate the ability of the surrogate model to estimate \gls{raw} performance accurately, even for points outside of the reduced input data space used for initial training.
 
+\textcolor{red}{
+In order to ensure no over-fitting occurred, the surrogate model also provides accurate results for data points outside the reduced input space (cf. Table~\ref{tab:sumo parameters}), Figure~\ref{fig:sumo-test-data} plots the \gls{cdf} of the relative error (i.e., ratio between absolute error and simulation results). In total, 2070 random data points were generated from all $2.3 \times 10^7$ possible points. It shows 90\% of the test data points has a relative error less than 10\% for both the throughput and energy models of HT and LT stations. These results validate the ability of the surrogate model to estimate \gls{raw} performance accurately, even for points outside of the reduced input data space used for initial training.}
+
 
 \subsection{\gls{raw} configuration analysis}
-In this section, we analysis the impact of different \gls{raw} configurations on the throughout and energy performance.
 
 
 \begin{figure}[t]
@@ -66,12 +68,6 @@ In this section, we analysis the impact of different \gls{raw} configurations on
 \end{figure}
 
 
-% \begin{figure}[t]
-%     \centering
-%     \subfloat[LT, all energy \label{fig:traffic-pattern-throughput}]{\includegraphics[width=0.35\textwidth]{image/pareto-front-energy-865dotsFor401}}\\
-%     \subfloat[HT, all energy \label{fig:traffic-pattern-throughput}]{\includegraphics[width=0.35\textwidth]{image/HT-pareto-front-energy}}
-%   \caption{\gls{raw} configurations for top 10\% highest energy efficiency. \label{fig:sumo-energy}}
-% \end{figure}
 
 
 \begin{figure}[t]
@@ -80,67 +76,64 @@ In this section, we analysis the impact of different \gls{raw} configurations on
     \subfloat[Energy consumption per packet \label{fig:traffic-pattern-throughput}]{\includegraphics[width=0.35\textwidth]{image/HT-pareto-front-energyPerPacket}}
   \caption{\gls{raw} configurations for top 10\% highest energy effiency. \label{fig:sumo-energy}}
 \end{figure}
+\textcolor{red}{
+In this section, based on the built model, we analysis the impact of different \gls{raw} configurations on throughout and energy consumption.
+First, for a certain number of stations, we derive the highest throughput $t_{max}$ and lowest energy consumption $e_{min}$ from the built mode. Second, we select the \gls{raw} configurations that lead to near optimal performance, i.e., throughput higher than 90\% of $t_{max}$, or energy consumption lower than  110\% of $e_{min}$. Figure xx and xx depict these \gls{raw} configurations for 200, 300 and 400 stations, respectively.
+As the figures show, less number of stations have more near optimal \gls{raw} configurations, which is straightforward, since the channel contention is less fierce and less transmission time is required. Moreover, the near optimal \gls{raw} slot number is discontinuous distributed. For example, for \gls{raw} duration 204.800 ms and 200 stations, slot number [9, 16],  [21, 26] and [40, 50] achieve the highest throughput. The reason is that a varying number of holding time can be wasted due to the \gls{ncsb} feature \cite{Evgeny2018}. Further more, for small number of stations, for example, it shows quite high performance can already be obtained by without \gls{RAW}, while \gls{raw} is definitely needed for large number of stations. 
+When there is not airtime limit, The packet deliver ratio and energy efficiency overlap, there exists some \gls{raw} configurations that can maximize both objectives simultaneously.}
 
-For the throughput, the small number of stations normally have more near optimal \gls{raw} configurations, which is straightforward, as it needs less time for transmission.
-
-A certain ranges of \gls{raw} slot can leads to good high throughput. For example, for \gls{raw} duration 204.800 ms, slot number [9, 16],  [21, 26] and [40, 50] achieve the highest throughput.
-
-There is a number of \gls{raw} slot numbers that can achieve high performance. For a certain slot number $s_r$ , once a high throughput can be achieved, a similar throughput can also be obtained with slot number $s_r^{'}$ larger than $s_r$. The reason is,
-$s_r^{'}$ number leads to less number of stations assigned to one \gls{raw} slot, therefore mitigate the channel contention, and maintain the throughput, or increase the throughput if there are more packets need to be sent. However, there are several exceptions. First of all, if the number of slots is too big, it may cause the \gls{raw} slot duration too short to transmit a single packet. Second,  \todo{the effect of non-cross slot boundary}. While for cross slot boundary, the performance fluctuation
-does not occur  \cite{WoWMoM2016} and \cite{Zheng2014}.
-Second, it can be observed that the normalized throughput increases in a fluctuating way as the duration of the RAW slot increases. The reason is that a varying number of mini-slots can be wasted due to the RAW slot handover between groups.
+%For a certain slot number $s_r$ , once a high throughput can be achieved, a similar throughput can also be obtained with slot number $s_r^{'}$ larger than $s_r$. The reason is, $s_r^{'}$ number leads to less number of stations assigned to one \gls{raw} slot, therefore mitigate the channel contention, and maintain the throughput, or increase the throughput if there are more packets need to be sent. However, there are several exceptions. First of all, if the number of slots is too big, it may cause the \gls{raw} slot duration too short to transmit a single packet. Second,  \todo{the effect of non-cross slot boundary}. While for cross slot boundary, the performance fluctuation does not occur  \cite{WoWMoM2016} and \cite{Zheng2014}. Second, it can be observed that the normalized throughput increases in a fluctuating way as the duration of the RAW slot increases. The reason is that a varying number of mini-slots can be wasted due to the RAW slot handover between groups.
 
 
-\begin{enumerate}
-\item There is a set of \gls{raw} slot numbers that can achieve high performance. 
-\item For shorter \gls{raw} duration, there is less options on the \gls{raw} slot number.
-\todo{affected by non cross slot boundary}
-\item For a certain number of stations, there is a requirement on the minimal \gls{raw} duration, denoted as \gls{d_r^{min}}. Any \gls{raw} duration larger than \gls{d_r^{min}}, can leads to higher throughput, with more options on the \gls{raw} slot number.
-\todo{affected by non cross slot boundary}
+% \begin{enumerate}
+% \item There is a set of \gls{raw} slot numbers that can achieve high performance. 
+% \item For shorter \gls{raw} duration, there is less options on the \gls{raw} slot number.
+% \todo{affected by non cross slot boundary}
+% \item For a certain number of stations, there is a requirement on the minimal \gls{raw} duration, denoted as \gls{d_r^{min}}. Any \gls{raw} duration larger than \gls{d_r^{min}}, can leads to higher throughput, with more options on the \gls{raw} slot number.
+% \todo{affected by non cross slot boundary}
+% \end{enumerate}
 
-\end{enumerate}
+% \textbf{findings for energy from simulation results}
+% \begin{enumerate}
+% \item Energy efficiency increase as \gls{raw} duration increase.
+% \item Energy efficiency increase as \gls{raw} duration increase.
+% \end{enumerate}
 
-\textbf{findings for energy from simulation results}
-\begin{enumerate}
-\item Energy efficiency increase as \gls{raw} duration increase.
-\item Energy efficiency increase as \gls{raw} duration increase.
-\end{enumerate}
-
-\textbf{findings for total energy from \ref{fig:sumo-energy}}
-\begin{enumerate}
-\item Large \gls{raw} duration has high energy efficiency .
-\item Requirement on the minimal \gls{raw} duration.
-\item Requirement on the minimal \gls{raw} \gls{raw} slot number for relative small \gls{raw} duration. Since too few slot number results in high contention.
-\item No Requirement on the minimal \gls{raw} \gls{raw} slot number for large \gls{raw} duration. because that the \gls{raw} slot duration is big enough.
-\item Number of good \gls{raw} performance configuration decrease as station number increase.
-\end{enumerate}
-
-
-\textbf{findings for energy on per packet, similar to throughput}
+% \textbf{findings for total energy from \ref{fig:sumo-energy}}
+% \begin{enumerate}
+% \item Large \gls{raw} duration has high energy efficiency .
+% \item Requirement on the minimal \gls{raw} duration.
+% \item Requirement on the minimal \gls{raw} \gls{raw} slot number for relative small \gls{raw} duration. Since too few slot number results in high contention.
+% \item No Requirement on the minimal \gls{raw} \gls{raw} slot number for large \gls{raw} duration. because that the \gls{raw} slot duration is big enough.
+% \item Number of good \gls{raw} performance configuration decrease as station number increase.
+% \end{enumerate}
 
 
-\textbf{findings for throughput, HT}
-\begin{enumerate}
-    \item 
-\end{enumerate}
+% \textbf{findings for energy on per packet, similar to throughput}
 
 
-\textbf{summary of the figures, when there is not airtime limit}
-\begin{enumerate}
-    \item when there is not airtime limit \\
-    The packet deliver ratio and energy efficiency overlap, there exists some \gls{raw} configurations that can maximize both objectives simultaneously.  Except (findings from 2070 simulations)
-    \begin{enumerate}
-        \item exception, HT, 204800 us and slot = 1, always got good throughput
-        \item exception, HT, 204800 us and slot = 1, always got good energy from 61 to 336 stations, then slot = 50 get good energy efficiency. 336 stations is a break point, where the achievable throughput start to decrease.
-         \item exception, LT, 204800 us and slot = 1, always got energy until 216 stations. Then 50 stations get good energy efficiency.
-         \item exception, LT, 204800 us and slot = 1, always got throughput until 216 stations. Then 50 stations get good throughput.
+% \textbf{findings for throughput, HT}
+% \begin{enumerate}
+%     \item 
+% \end{enumerate}
+
+
+% \textbf{summary of the figures, when there is not airtime limit}
+% \begin{enumerate}
+%     \item when there is not airtime limit \\
+%     The packet deliver ratio and energy efficiency overlap, there exists some \gls{raw} configurations that can maximize both objectives simultaneously.  Except (findings from 2070 simulations)
+%     \begin{enumerate}
+%         \item exception, HT, 204800 us and slot = 1, always got good throughput
+%         \item exception, HT, 204800 us and slot = 1, always got good energy from 61 to 336 stations, then slot = 50 get good energy efficiency. 336 stations is a break point, where the achievable throughput start to decrease.
+%          \item exception, LT, 204800 us and slot = 1, always got energy until 216 stations. Then 50 stations get good energy efficiency.
+%          \item exception, LT, 204800 us and slot = 1, always got throughput until 216 stations. Then 50 stations get good throughput.
 
          
 
-    \end{enumerate}
-    \item when airtime is an valuable resource,  i.e., throughput is considered with packet deliver ratio higher than 99\%  \\
-    there is a tradeoff.
-\end{enumerate}
+%     \end{enumerate}
+%     \item when airtime is an valuable resource,  i.e., throughput is considered with packet deliver ratio higher than 99\%  \\
+%     there is a tradeoff.
+% \end{enumerate}
 
 
 
