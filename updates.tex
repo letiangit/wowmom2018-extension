@@ -63,6 +63,7 @@
 \usepackage{commath}
 \usepackage[acronym]{glossaries}
 
+
 %\usepackage{mathptmx}
 %\DeclareCaptionFont{xipt}{\fontsize{11}{13}\mdseries}
 %\usepackage[font=xipt,labelfont=bf]{caption}
@@ -237,7 +238,11 @@ For the station number on the edge (i.e., all packet can get through with proper
 
 For the station number above the edge (i.e., all packet \textb{cannot} get through with proper \gls{raw} configuration), only allow part of the stations to send with proper \gls{raw} configuration to get all packet throughput. Always use the largest \gls{raw} duration, as it benefit both throughput and energy.
 
-
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.8\columnwidth]{image/raw.pdf}
+  \caption{Schematic representation of the \gls{raw} mechanism.\label{fig:RAW}}
+\end{figure}
 
 
 

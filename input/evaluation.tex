@@ -50,15 +50,7 @@ Latency is defined as the average time between a packet entering the transmit qu
 
 In this section we evaluate the training convergence of the surrogate model, as well as its accuracy compared to simulation results. Figure~\ref{fig:sumo-iteraton} plots the model's cross validation score as a function of the number of training samples used. The cross validation score provides a measure for the accuracy of the resulting model. A consistently low score signifies that the training process has converged. 
 %Based on this graph, we can conclude that for both the model with high-throughput (HT) and low-throughput (LT) stations, convergence occurs after around $1700$ training samples have been used.
-\textcolor{red}{The results show, for the throughput models of both high-throughput (HT) and low-throughput (LT) stations, convergence occurs after around $1700$ training samples have been used. The convergence of energy models happens after 1900 and 2500 training samples have been used for energy models of  HT and LT stations, respectively. The training of the HT throughput model and LT energy model stopped after 2370 and 2400 iterations respectively, as it satisfied the cross-validation stop conditions, i.e., 20 consecutive cross-validation scores lower than or equal to $0.xx$ (2 digits of precision). The training of the other models stopped after the maximum number of 2500 iterations, having achieved 15 consecutive cross-validation scores between $0.11$ and $0.12$ for LT throughput model, and 9 consecutive cross-validation scores between $0.054$ and $0.058$ for HT energy model.} This comes down to about $0.0074$\% of all data points in the input space (i.e., $2.3 \times 10^7$), and about $6.8$\% of the reduced data space (i.e., $25047$) from which samples were drawn during training. 
-
-\textcolor{red}{The cross-validation scores decrease as more training samples have been used is due to the sampling strategy FLOLA-Voronoi. It selects points from non-linear regions and the sparsely sampled regions, making the model more and more accurate. It should be noted, the cross-validation scores fluctuate  sometimes, 
-
-FLOLA-Voronoi
-
-FLOLA approach is used for exploiting the non-linear regions, while the Voronoi approach exploresthe sparsely sampled regions
-
-It should be noted}
+\textcolor{red}{The results show, for the throughput models of both high-throughput (HT) and low-throughput (LT) stations, convergence occurs after around $1700$ training samples have been used. The convergence of energy models happens after 1900 and 2500 training samples have been used for energy models of  HT and LT stations, respectively. The training of the HT throughput model and LT energy model stopped after 2370 and 2400 iterations respectively, as it satisfied the cross-validation stop conditions, i.e., 20 consecutive cross-validation scores lower than or equal to $0.xx$ (2 digits of precision). The training of the other models stopped after the maximum number of 2500 iterations, having achieved 15 consecutive cross-validation scores between $0.11$ and $0.12$ for LT throughput model, and 9 consecutive cross-validation scores between $0.054$ and $0.058$ for HT energy model.} This comes down to about $0.0074$\% of all data points in the input space (i.e., $2.3 \times 10^7$), and about $6.8$\% of the reduced data space (i.e., $25047$) from which samples were drawn during training. \textcolor{red}{The cross-validation scores decrease as more training samples have been used is due to the sampling strategy FLOLA-Voronoi. It selects points from non-linear regions and the sparsely sampled regions, making the model more and more accurate. It should be noted, the cross-validation scores fluctuate sometimes, that is  because new training samples points are selected from an untouched region, and the surrogate model is  recalculated to consider the new change. }
 
 %In order to ensure no over-fitting occurred, the surrogate model also provides accurate results for data points outside the reduced input space (cf. Table~\ref{tab:sumo parameters}), Figure~\ref{fig:sumo-test-data} plots the absolute error (in terms of throughput) of the surrogate model compared to simulation results. In total, 2070 random data points were generated from all $2.3 \times 10^7$ possible points. The figure also plots the actual simulated throughput of each point, to characterize the significance of the error. For the HT model, the absolute throughput estimation error stays below 0.02~Mbps for the first 2000 points (i.e., $96.6$\% of all data points). The absolute error only goes above $0.1$~Mbps for 3 data points (i.e., $0.14$\%). Similarly, for the LT model, the throughput estimation error stays below $0.004$~Mbps for the first 2000 data points, and only grows above $0.01$~Mbps for the worst 11 data points. In terms of the relative error (i.e., ratio between absolute throughput error and simulation results, not depicted) of the surrogate model compared to simulations, 95\% of all data points have an error below 6.6\% and 5.4\% for the HT and LT model respectively. For both models, 98\% of the data points have a relative error below 10\%. These results validate the ability of the surrogate model to estimate \gls{raw} performance accurately, even for points outside of the reduced input data space used for initial training.
 
@@ -73,7 +65,7 @@ In order to ensure no over-fitting occurred, the surrogate model also provides a
     \centering
     \subfloat[LT \label{fig:traffic-pattern-throughput}]{\includegraphics[width=0.35\textwidth]{image/LT-pareto-front-throughput}}\\
     \subfloat[HT \label{fig:traffic-pattern-throughput}]{\includegraphics[width=0.35\textwidth]{image/HT-pareto-front-throughput}}
-  \caption{\gls{raw} configurations for top 10\% packet deliver ratio. \label{fig:sumo-energy}}
+  \caption{\gls{raw} configurations for top 10\% packet deliver ratio. \label{fig:ana-throughput}}
 \end{figure}
 
 
@@ -83,13 +75,18 @@ In order to ensure no over-fitting occurred, the surrogate model also provides a
     \centering
     \subfloat[LT, energy per packet \label{fig:traffic-pattern-throughput}]{\includegraphics[width=0.35\textwidth]{image/LT-pareto-front-energyPerPacket}}\\
     \subfloat[Energy consumption per packet \label{fig:traffic-pattern-throughput}]{\includegraphics[width=0.35\textwidth]{image/HT-pareto-front-energyPerPacket}}
-  \caption{\gls{raw} configurations for top 10\% highest energy effiency. \label{fig:sumo-energy}}
+  \caption{\gls{raw} configurations for top 10\% highest energy efficiency. \label{fig:ana-energy}}
 \end{figure}
-\textcolor{red}{
-In this section, based on the built model, we analysis the impact of different \gls{raw} configurations on throughout and energy consumption.
-First, for a certain number of stations, we derive the highest throughput $t_{max}$ and lowest energy consumption $e_{min}$ from the built mode. Second, we select the \gls{raw} configurations that lead to near optimal performance, i.e., throughput higher than 90\% of $t_{max}$, or energy consumption lower than  110\% of $e_{min}$. Figure xx and xx depict these \gls{raw} configurations for 200, 300 and 400 stations, respectively.
-As the figures show, less number of stations have more near optimal \gls{raw} configurations, which is straightforward, since the channel contention is less fierce and less transmission time is required. Moreover, the near optimal \gls{raw} slot number is discontinuous distributed. For example, for \gls{raw} duration 204.800 ms and 200 stations, slot number [9, 16],  [21, 26] and [40, 50] achieve the highest throughput. The reason is that a varying number of holding time can be wasted due to the \gls{ncsb} feature \cite{Evgeny2018}. Further more, for small number of stations, for example, it shows quite high performance can already be obtained by without \gls{RAW}, while \gls{raw} is definitely needed for large number of stations. 
-When there is not airtime limit, The packet deliver ratio and energy efficiency overlap, there exists some \gls{raw} configurations that can maximize both objectives simultaneously.}
+
+
+\begin{figure}[t]
+    \centering
+    \subfloat[LT \label{fig:pareto-LT}]{\includegraphics[width=0.35\textwidth]{image/LT-pareto-front201}}\\
+    \subfloat[HT \label{fig:pareto-HT}]{\includegraphics[width=0.35\textwidth]{image/HT-pareto-front201}}
+    \caption{Pareto front of throughput and energy per station. \label{fig:sumo-pareto}}
+\end{figure}
+
+\textcolor{red}{In this section, based on the built model, we analysis the impact of different \gls{raw} configurations on throughout and energy consumption, and the optimal \gls{raw} configuration. For each number of stations, we derive the highest output $t_{max}$ and  $e_{min}$ from the built mode $\mathcal{F}_t\left(\cdot\right)$, and Subsequently, we select the \gls{raw} configurations that lead to near optimal performance, i.e., throughput higher than 90\% of $t_{max}$, or energy consumption lower than  110\% of $e_{min}$. Figure \ref{fig:ana-throughput} and \ref{fig:ana-energy} depict these \gls{raw} configurations for 200, 300 and 400 stations, respectively. As the figures show, less number of stations have more near optimal \gls{raw} configurations, which is straightforward, since the channel contention is less fierce and less transmission time is required. Moreover, the near optimal \gls{raw} slot number is discontinuous distributed. For example, for \gls{raw} duration 204.800 ms and 200 stations, slot number [9, 16],  [21, 26] and [40, 50] achieve the highest throughput. The reason is that a varying number of holding time can be wasted due to the \gls{ncsb} feature \cite{Evgeny2018}. Further more, for small number of stations, for example, quite high performance can already be obtained by without \gls{RAW} (i.e., one \gls{raw} slot), while \gls{raw} is definitely needed for large number of stations. When there is not airtime limit, the packet deliver ratio and energy efficiency overlap, there exists some \gls{raw} configurations that can maximize both objectives simultaneously. Figure \ref{fig:sumo-pareto} plots the Pareto front of throughput and energy consumption per packet for 200 stations. As it shows, the LT stations have only one Pareto front solution, i.e., the objective of maximizing throughput and minimizing energy consumption can be achieved simultaneously. While the HT stations have several Pareto front solutions, different solutions can be chosen based on the preference on each objective.}
 
 %For a certain slot number $s_r$ , once a high throughput can be achieved, a similar throughput can also be obtained with slot number $s_r^{'}$ larger than $s_r$. The reason is, $s_r^{'}$ number leads to less number of stations assigned to one \gls{raw} slot, therefore mitigate the channel contention, and maintain the throughput, or increase the throughput if there are more packets need to be sent. However, there are several exceptions. First of all, if the number of slots is too big, it may cause the \gls{raw} slot duration too short to transmit a single packet. Second,  \todo{the effect of non-cross slot boundary}. While for cross slot boundary, the performance fluctuation does not occur  \cite{WoWMoM2016} and \cite{Zheng2014}. Second, it can be observed that the normalized throughput increases in a fluctuating way as the duration of the RAW slot increases. The reason is that a varying number of mini-slots can be wasted due to the RAW slot handover between groups.
 
@@ -149,12 +146,7 @@ When there is not airtime limit, The packet deliver ratio and energy efficiency 
 
 
 
-\begin{figure}[t]
-    \centering
-    \subfloat[LT \label{fig:traffic-pattern-throughput}]{\includegraphics[width=0.35\textwidth]{image/LT-pareto-front201}}\\
-    \subfloat[HT \label{fig:traffic-pattern-throughput}]{\includegraphics[width=0.35\textwidth]{image/HT-pareto-front201}}
-  \caption{ Pareto front of throughput and energy per station. \label{fig:sumo-energy}}
-\end{figure}
+
 
 
 
@@ -165,19 +157,34 @@ When there is not airtime limit, The packet deliver ratio and energy efficiency 
 
 \begin{figure}[t]
     \centering
-    \subfloat[Throughput \label{fig:traffic-pattern-throughput}]{\includegraphics[width=0.35\textwidth]{image/algorithm/throughput-homo}}\\
-    \subfloat[Latency \label{fig:traffic-pattern-throughput}]{\includegraphics[width=0.35\textwidth]{image/algorithm/delay-homo}}
-  \caption{Performance comparison between \gls{moroa} and \gls{etaroa} for the LT scenarios with different traffic loads and station counts. \label{fig:sumo-home}}
+    \subfloat[Throughput \label{fig:traffic-pattern-throughput}]{\includegraphics[width=0.75\columnwidth]
+    {image/algorithm/throughput-aidaddress-alpha-1-0}} \\
+    \subfloat[Energy consumption \label{fig:traffic-pattern-throughput}]{\includegraphics[width=0.75\columnwidth]
+    {image/algorithm/Energy_aidaddre_ncr-alpha-1-0}}
+  \caption{\textcolor{red}{Performance comparison between \gls{moroa} and \gls{etaroa} using $\alpha=0, 1$  for the LT scenarios with different traffic loads and station counts.} \label{fig:sumo-home}
+  }
 \end{figure}
+
+
+
+
+
+
 
 %Compare original E-TAROA (one station per slot) and revised E-TAROA (using SUMO modeling) in terms of throughput, latency and energy consumption. 
 %
-In this section we evaluate the performance of \gls{moroa} for homogeneous stations (in terms of \gls{mcs} and packet size) for a variety of traffic loads and station counts. Three different total traffic loads are simulated for the LT scenario, i.e., $T$ = \{0.095, 0.11, 0.15\}~Mbps.  Given the packet payload size and data rate, the maximum throughput that can be achieved is about 0.124~Mbps for LT stations. As such, $T = 0.15$~Mbps represents a near-saturated state, $T = 0.11$~Mbps represents a medium traffic load and $T = 0.095$~Mbps results in low traffic load. %Each station randomly chooses its transmission transmission interval, and the ratio between maximal and minimal transmission interval is up to 20 \cite{Sensor2017}. 
+%In this section we evaluate the performance of \gls{moroa} for homogeneous stations (in terms of \gls{mcs} and packet size) for a variety of traffic loads and station counts. Three different total traffic loads are simulated for the LT scenario, i.e., $T$ = \{0.095, 0.11, 0.15\}~Mbps.  Given the packet payload size and data rate, the maximum throughput that can be achieved is about 0.124~Mbps for LT stations. As such, $T = 0.15$~Mbps represents a near-saturated state, $T = 0.11$~Mbps represents a medium traffic load and $T = 0.095$~Mbps results in low traffic load. %Each station randomly chooses its transmission transmission interval, and the ratio between maximal and minimal transmission interval is up to 20 \cite{Sensor2017}. 
+%As \gls{etaroa} was already shown to outperform \gls{edca} for homogeneous stations, we use \gls{etaroa} as a benchmark in this section~\cite{Sensys2017}.
+
+\textcolor{red}{
+In this section we evaluate the performance of \gls{moroa} for homogeneous stations (in terms of \gls{mcs} and packet size) with $\alpha = 0$ and $\alpha = 1$ for a variety of traffic loads and station counts. Two different total traffic loads are simulated for the LT scenario, i.e., $T$ = \{0.11, 0.15\}~Mbps.  Given the packet payload size and \gls{mcs}, the maximum throughput that can be achieved is about 0.124~Mbps for LT stations. As such, $T = 0.15$~Mbps represents a near-saturated state, $T = 0.11$~Mbps represents a medium traffic load. Each station randomly chooses its transmission transmission interval, and the ratio between maximal and minimal transmission interval is up to 20 \cite{Sensor2017}. }
 As \gls{etaroa} was already shown to outperform \gls{edca} for homogeneous stations, we use \gls{etaroa} as a benchmark in this section~\cite{Sensys2017}.
 
-Figure~\ref{fig:sumo-home} depicts performance (i.e., throughput and latency) of \gls{moroa} and \gls{etaroa}. It clearly shows that, compared to \gls{etaroa}, \gls{moroa} improves the throughput under near saturated traffic conditions for any number of stations. 
-At low traffic loads, \gls{moroa} and \gls{etaroa} have the same throughput for any number of stations.
-Under medium traffic conditions, \gls{moroa} also improves performance for a low number of stations. More importantly, better latency performance is achieved in denser networks. For a low traffic load (i.e., $0.095$~Mbps), \gls{moroa} and \gls{etaroa} have  nearly the same latency when there are less than 1024 stations. However, for 2048 stations, latency of \gls{moroa} is about $32.5$\% lower. For higher traffic loads, \gls{moroa} has better latency even in less dense networks (i.e., starting from 512 and 128 stations for traffic load $0.11$ and $0.15$~Mbps respectively). The above results reveal that, by using surrogate modeling, stations are assigned to RAW groups in a more optimal way. This is due to the fact that \gls{etaroa} derives its optimal \gls{raw} parameters from a model under saturated state as an approximation, rather than optimizing them for different traffic conditions as the surrogate model does. This results in better overall performance in terms of throughput and latency.
+%Figure~\ref{fig:sumo-home} depicts performance (i.e., throughput and latency) of \gls{moroa} and \gls{etaroa}. It clearly shows that, compared to \gls{etaroa}, \gls{moroa} improves the throughput under near saturated traffic conditions for any number of stations. At low traffic loads, \gls{moroa} and \gls{etaroa} have the same throughput for any number of stations. Under medium traffic conditions, \gls{moroa} also improves performance for a low number of stations. More importantly, better latency performance is achieved in denser networks. For a low traffic load (i.e., $0.095$~Mbps), \gls{moroa} and \gls{etaroa} have  nearly the same latency when there are less than 1024 stations. However, for 2048 stations, latency of \gls{moroa} is about $32.5$\% lower. For higher traffic loads, \gls{moroa} has better latency even in less dense networks (i.e., starting from 512 and 128 stations for traffic load $0.11$ and $0.15$~Mbps respectively). The above results reveal that, by using surrogate modeling, stations are assigned to RAW groups in a more optimal way. This is due to the fact that \gls{etaroa} derives its optimal \gls{raw} parameters from a model under saturated state as an approximation, rather than optimizing them for different traffic conditions as the surrogate model does. This results in better overall performance in terms of throughput and latency.
+
+\textcolor{red}{Figure~\ref{fig:sumo-home} depicts performance (i.e., throughput and energy consumption) of \gls{moroa} and \gls{etaroa}. It clearly shows that, compared to \gls{etaroa}, \gls{moroa} can tune the values of $\alpha$ to optimize the required performance objective. For $\alpha = 1$, \gls{moroa} improves the throughput under near saturated traffic conditions for any number of stations. Under medium traffic conditions, \gls{moroa} also improves performance for a low number of stations. While in terms of energy consumption, \gls{moroa} consumes more energy than \gls{etaroa} does for both near saturated and medium traffic  conditions. Moreover, \gls{etaroa} has the similar power consumption for both traffic load, while the power  consumption of \gls{moroa} increases when the network traffic load changes. Conversely, when $\alpha$ is  $0$,  \gls{moroa} improves the energy efficiency while results in a bit less throughput. The above results reveal that, by using surrogate modeling, stations can be assigned to RAW groups in a more optimal way for the desired performance objective by using the corresponding $\alpha$ value. 
+%This is due to the fact that \gls{etaroa} derives its optimal \gls{raw} parameters from a model under saturated state as an approximation, rather than optimizing them for different traffic conditions as the surrogate model does. This results in better overall performance in terms of throughput and latency.
+}
 
 
 \subsection{Heterogeneous stations}
@@ -194,12 +201,11 @@ Under medium traffic conditions, \gls{moroa} also improves performance for a low
 \begin{figure}[t]
     \centering
     \subfloat[Throughput \label{fig:throughput-alpha-0}]{\includegraphics[width=0.35\textwidth]{image/algorithm/final-throughput-merge-alpha-0}}\\
-    \subfloat[Fairness \label{fig:delay-alpha-0}]{\includegraphics[width=0.35\textwidth]{image/algorithm/final-fariness-merge-alpha-0percentage}}
-  \caption{Performance comparison between \gls{moroa} and \gls{edca}, for a heterogeneous network. \label{fig:sumo-throughput-csma}}
+    \subfloat[Energy consumption \label{fig:delay-alpha-0}]{\includegraphics[width=0.35\textwidth]{image/algorithm/final-fariness-merge-alpha-0percentage}}
+  \caption{\textcolor{red}{Performance comparison between \gls{moroa} and \gls{edca}, for a heterogeneous network.} \label{fig:sumo-throughput-csma}}
 \end{figure}
 
 In this section, we study the performance of \gls{moroa} in a network with heterogeneous stations. Moreover, we evaluate the effects of the $\alpha$ weight parameter on throughput and fairness among the LT and HT station groups, for a variety of network densities. As \gls{etaroa} only supports stations with the same \gls{mcs} and packet size, the results of \gls{moroa} are compared to \gls{edca} in this case. 
-
 %Figure \ref{fig:throughput-alpha} shows that by increasing the value of $\alpha$, higher throughput can be achieved. Between $\alpha=0.25$ and $\alpha=0.5$, throughput increases $22$\%, $36$\%, $44$\% for $1200$, $1400$ and $1600$ stations respectively. While for $\alpha$ less than $0.25$ or larger than $0.5$, the throughput does not significantly change. For the small size networks, it shows there is no need to tune $\alpha$. Figure~\ref{fig:fairness-alpha-percent} illustrates the fairness with different $\alpha$, depicting the same conclusion.  With smaller values of $\alpha$, more fairness is achieved in terms of relative transmitted number of packets between LT and HT stations. Increasing $\alpha$ results in more focus on throughput, resulting in more airtime being provided to the HT stations. %The interesting finding from figure \ref{fig:sumo-alpha} is, although $\alpha$ is defined between 0 and 1, the actual range that affects the results is much smaller. More investigation are needed about tunning the $\alpha$, in order to achieve the required performance, it is considered as  our next step. 
 
 The comparison between \gls{moroa} and \gls{edca} is depicted in figure \ref{fig:sumo-throughput-csma}. With a small number of stations, \gls{moroa} and \gls{edca} have the same throughput. With more than 600 stations, the throughput of \gls{edca} stagnates to about 0.25~Mbps as the network becomes saturated. However, \gls{moroa} reduces the number of collisions, resulting in better scaling behavior and a higher saturation limit. As a result, for 1800 stations throughput of \gls{moroa} is about 44\% higher for $\alpha=0$ and  $\alpha=0.25$. If more focus is put on the throughput objective, with $\alpha=0.75$, \gls{moroa} more than doubles throughput compared to \gls{edca} in highly dense networks (i.e., 1800 stations), achieving a throughput increase of 108\%. As expected, \gls{edca} achieves high fairness among HT and LT stations due to its random access mechanism. For $\alpha \leq 0.25$ \gls{moroa} achieves a similar degree of fairness. However, for $\alpha = 0.75$ fairness of \gls{moroa} is significantly reduced, as it prioritizes HT stations to maximize overall throughput.
@@ -226,12 +232,10 @@ The comparison between \gls{moroa} and \gls{edca} is depicted in figure \ref{fig
 % %  \caption{Performance comparison between SUMO-E-TAROA and EDCA/DCF for mixed scenario with 50\% LT stations and 50\% stations. \label{fig:sumo-throughput}}
 % %\end{figure*}
 
-% %\begin{figure*}[t]
-%     \subfloat[Ratio 75\%:25\%, throughput \label{fig:traffic-pattern-throughput}]{\includegraphics[width=0.5\textwidth]{image/algorithm/throughput-static-taroa-nc-aidre-075}}
-%     \subfloat[Ratio 75\%:25\%, latency \label{fig:traffic-pattern-throughput}]{\includegraphics[width=0.5\textwidth]{image/algorithm/delay-static-taroa-nc-aidre-075}}
-%   \caption{Performance comparison between SUMO-E-TAROA and EDCA/DCF for mixed scenarios with different 
-%    ratio of LT stations to HT stations.\label{fig:sumo-throughput}}
-% \end{figure*}
+
+
+
+
 
 %\subsection{dynamic traffic pattern (optional)}
 
