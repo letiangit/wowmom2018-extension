@@ -36,7 +36,7 @@ Subsequently, by taking the fairness into account, the \gls{ap} determines which
 
 \textcolor{red}{Finding the \gls{raw} parameter values that optimize the chosen performance metrics (e.g., maximizing throughput and minimizing energy) can be formulated as an multi-objective optimization problem. Not only the objectives of a group may not coincide, but also the objectives among different groups can be conflicting due the the airtime constraint. As the sum of all group durations should not be higher than the beacon interval duration $d_b$, the chosen duration $d_i$ of a cluster $i$ influences the \gls{raw} duration of other clusters. Common approach to solving multi-objective optimization problems is to first generate a Pareto front set from which the designer chooses the most desirable. A Pareto front set of a set of solutions where any improvement in one objective results in the worsening of at least one other objective. In reality, the decision maker is not interested in discovering the whole Pareto front rather than finding only the portion(s) of the front that matches at most his/her preferences. 
 There have been many methods suggested for multi-objective optimization, such as weighted global criterion method, weighted sum method, lexicographic method and weighted min-max method \cite{marler2004survey}. The methods allow the user to specify preferences, which may be articulated in terms of goals or the relative importance of different objectives. %Most of these methods incorporate parameters, which are coefficients, exponents, constraint limits, etc. that can either be set to reflect decision-maker preferences, or be continuously altered in an effort to represent the complete Pareto optimal set.
-As an illustration, we define an objective function that maximizes throughput and minimize energy consumption, using weight sum method. However, other objectives such as airtime fairness, latency minimization can easily be defined as well,  as the model can be trivially trained for a variety of metrics. The problem can be formulated as follows:
+As an illustration, we define an objective function that maximizes packet deliver ratio and minimize energy consumption, using a method combining  weighted sum and min-max method. However, other objectives such as airtime fairness, latency minimization can easily be defined as well,  as the model can be trivially trained for a variety of metrics. The problem can be formulated as follows:
 } 
 
 
@@ -46,16 +46,17 @@ As an illustration, we define an objective function that maximizes throughput an
 %However, other objectives such as airtime fairness, latency minimization can easily be defined as well. The problem can be formulated as follows:
 \textcolor{red}{
 \begin{equation} \label{eq:objective}
-\max \left( \alpha \times \mathcal{Q}_t + \left(1 - \alpha \right) \times \mathcal{Q}_e \right)
+\max \left( \alpha \times \mathcal{Q}_t - \left(1 - \alpha \right) \times \mathcal{Q}_e \right)
 \end{equation}
 With:
 \begin{equation} \label{eq:objectiveT}
-\mathcal{Q}_t =  \sum\limits_{i=1}^{k}  \frac{\mathcal{F}_t\left(n_i, d_i, s_i\right)}{n_i^b \times l_i}
+%\mathcal{Q}_t =  \sum\limits_{i=1}^{k}  \frac{\mathcal{F}_t\left(n_i, d_i, s_i\right)}{n_i^b \times l_i}
+\mathcal{Q}_t =  \min_{i \in \left[1, k\right]} \left(  \frac{\mathcal{F}_t\left(n_i, d_i, s_i\right)}{n_i^b \times l_i}  \right)
 \end{equation}
 And
 \begin{equation} \label{eq:objectiveF}
-%\mathcal{Q}_e =  \min_{i \in \left[1, k\right]} \left(  \frac{ \mathcal{F}_t (n_i, d_i, s_i) }{n_i^b \times l_i}  \right)
-\mathcal{Q}_e =  \sum \limits_{i=1}^{k}  \frac{\mathcal{F}_e\left(n_i, d_i, s_i\right)}{\mathcal{F}_t\left(n_i, d_i, s_i\right) \times E_i}
+\mathcal{Q}_e =  \max_{i \in \left[1, k\right]} \left(  \frac{ \mathcal{F}_t (n_i, d_i, s_i) }{\mathcal{F}_t\left(n_i, d_i, s_i\right) \times E_i}  \right)
+%\mathcal{Q}_e =  \sum \limits_{i=1}^{k}  \frac{\mathcal{F}_e\left(n_i, d_i, s_i\right)}{\mathcal{F}_t\left(n_i, d_i, s_i\right) \times E_i}
 \end{equation}
 }
 Subject to:
@@ -74,8 +75,11 @@ Subject to:
 
 
  \textcolor{red}{
-As the throughput and energy consumption depend on the MCS and packet size, both objectives are normalized as to align their valid value range and simplify selection of $\alpha$. ${Q}_t$ represents the objective of normalized throughput, while ${Q}_e$ represents the objective of normalized energy consumption per packet. 
-The normalized throughput represent the ratio between packet received and transmitted, and normalized energy consumption per packet is calculated as the ratio between energy consumption per packet and $E_i$.  $E_i$ represents, when no channel contention occurs, energy consumed by a single packet transmission for a station having same the \gls{mcs} and packet size as group $i$ does.  \gls{raw} groups are allowed to use all the airtime (i.e., the entire beacon interval) in our targeting scenarios, as represented by Eq. \ref{eq:sslot}. As such, in our algorithm, the airtime used by \gls{raw} groups do not contribute to the objectives.} Note that this formulation assumes that stations will only attempt to transmit one packet per beacon interval. This assumption generally holds for sensor scenarios, where the throughput of individual stations is low~\cite{Khorov2015b}. In reality, some stations may have multiple packets queued, especially when the traffic estimator is still learning~\cite{Sensys2017}. However, this has a negligible effect on performance of the algorithm over longer periods. Currently, \gls{moroa} does not consider the required sequentiality of \glspl{aid} in the \gls{rps} element, as we consider \gls{aid} reassignment a separate issue left for future work.
+${Q}_t$ represents the objective of packet deliver ratio, while ${Q}_e$ represents the objective of energy consumption per packet. Both objective tries to find a balance among different groups. As the throughput and energy consumption depend on the \gls{mcs} and packet size, both objectives are normalized as to align their valid value range and simplify selection of $\alpha$. $E_i$ represents, when no channel contention occurs, energy consumed by a single packet transmission for a station having same the \gls{mcs} and packet size as group $i$ does. \gls{raw} groups are allowed to use all the airtime (i.e., the entire beacon interval) in our targeting scenarios, as represented by Eq. \ref{eq:sslot}. As such, in our algorithm, the airtime used by \gls{raw} groups do not contribute to the objectives.} Note that this formulation assumes that stations will only attempt to transmit one packet per beacon interval. This assumption generally holds for sensor scenarios, where the throughput of individual stations is low~\cite{Khorov2015b}. In reality, some stations may have multiple packets queued, especially when the traffic estimator is still learning~\cite{Sensys2017}. However, this has a negligible effect on performance of the algorithm over longer periods. Currently, \gls{moroa} does not consider the required sequentiality of \glspl{aid} in the \gls{rps} element, as we consider \gls{aid} reassignment a separate issue left for future work.
+
+
+%The normalized throughput represent the ratio between packet received and transmitted, and normalized energy consumption per packet is calculated as the ratio between energy consumption per packet and $E_i$.  $E_i$ represents, when no channel contention occurs, energy consumed by a single packet transmission for a station having same the \gls{mcs} and packet size as group $i$ does.
+
 
 %\textcolor{red}{For the moment, we slightly modify the RPS element to assign stations to the same RAW group without the sequential AID constraint, AID dynamic re-assignment is considered future work to fully stick to the 802.11ah requirement.}
 %To be able to assign modifying the PS-Poll frame structure in the 802.11ah standard Since only stations with sequential AID can be assigned to the same group, AID re-assignment to further optimize latency as well as throughput is considered future work.}

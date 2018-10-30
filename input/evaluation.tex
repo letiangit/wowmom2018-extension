@@ -16,10 +16,8 @@ All evaluations are performed using our previously developed IEEE~802.11ah ns-3 
 RAW performance is evaluated in terms of three metrics: throughput, fairness, and latency. Throughput is calculated as the average number of successfully received payload bytes by the \gls{ap} per second. Fairness between HT and LT stations in terms of packet delivery ratio is evaluated using Jain's fairness index.
 %\textcolor{red}{TODO: Say exactly what you compare using Jain's fairness index. Is it throughput, number of packets, relative, absolute, ...}
 Latency is defined as the average time between a packet entering the transmit queue of the station and being received by the \gls{ap}. Each simulation runs for 600~seconds, and all results are averaged over 10 iterations, with the variability of results over these iterations quantified using the standard deviation (SD).
-%\textcolor{red}{TODO: mention the number of iterations over which results are averaged.}
 
 
-%All results are averaged over 10 iterations, with the variability of results over these iterations quantified using the standard deviation (SD).
 
 % Run original E-TAROA (one station per slot) until the estimation is stable, then switch to E-TAROA(SUMO). \textcolor{red}{when should the switch happen?}
 % \\
@@ -34,7 +32,7 @@ Latency is defined as the average time between a packet entering the transmit qu
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=0.75\columnwidth]{image/throughput-cv}
+  \includegraphics[width=0.75\columnwidth]{image/throughput_cv}
   \caption{\textcolor{red}{Cross validation score of the surrogate model as a function of the number of training iterations.} \label{fig:sumo-iteraton}}
 \end{figure}
 
@@ -43,19 +41,17 @@ Latency is defined as the average time between a packet entering the transmit qu
 
 \begin{figure}[t]
   \centering
-  %\includegraphics[width=0.75\columnwidth]{image/testdata-abs}
     \includegraphics[width=0.75\columnwidth]{image/model_error}
   \caption{\textcolor{red}{Performance comparison between the surrogate model and simulation results for 2070 random test data points, sorted in ascending order in terms of estimation error.}\label{fig:sumo-test-data}}
 \end{figure}
 
 In this section we evaluate the training convergence of the surrogate model, as well as its accuracy compared to simulation results. Figure~\ref{fig:sumo-iteraton} plots the model's cross validation score as a function of the number of training samples used. The cross validation score provides a measure for the accuracy of the resulting model. A consistently low score signifies that the training process has converged. 
 %Based on this graph, we can conclude that for both the model with high-throughput (HT) and low-throughput (LT) stations, convergence occurs after around $1700$ training samples have been used.
-\textcolor{red}{The results show, for the throughput models of both high-throughput (HT) and low-throughput (LT) stations, convergence occurs after around $1700$ training samples have been used. The convergence of energy models happens after 1900 and 2500 training samples have been used for energy models of  HT and LT stations, respectively. The training of the HT throughput model and LT energy model stopped after 2370 and 2400 iterations respectively, as it satisfied the cross-validation stop conditions, i.e., 20 consecutive cross-validation scores lower than or equal to $0.xx$ (2 digits of precision). The training of the other models stopped after the maximum number of 2500 iterations, having achieved 15 consecutive cross-validation scores between $0.11$ and $0.12$ for LT throughput model, and 9 consecutive cross-validation scores between $0.054$ and $0.058$ for HT energy model.} This comes down to about $0.0074$\% of all data points in the input space (i.e., $2.3 \times 10^7$), and about $6.8$\% of the reduced data space (i.e., $25047$) from which samples were drawn during training. \textcolor{red}{The cross-validation scores decrease as more training samples have been used is due to the sampling strategy FLOLA-Voronoi. It selects points from non-linear regions and the sparsely sampled regions, making the model more and more accurate. It should be noted, the cross-validation scores fluctuate sometimes, that is  because new training samples points are selected from an untouched region, and the surrogate model is  recalculated to consider the new change. }
+\textcolor{red}{The results show, for the throughput models of both high-throughput (HT) and low-throughput (LT) stations, convergence occurs after around $1700$ training samples have been used. The convergence of energy models happens after 1900 and 2500 training samples have been used for energy models of  HT and LT stations, respectively. The training of the HT throughput model and LT energy model stopped after 2370 and 2400 iterations respectively, as it satisfied the cross-validation stop conditions, i.e., 20 consecutive cross-validation scores lower than or equal to $0.xx$ (2 digits of precision). The training of the other models stopped after the maximum number of 2500 iterations, having achieved 15 consecutive cross-validation scores between $0.11$ and $0.12$ for LT throughput model, and 9 consecutive cross-validation scores between $0.054$ and $0.058$ for HT energy model.} This comes down to about $0.0074$\% of all data points in the input space (i.e., $2.3 \times 10^7$), and about $6.8$\% of the reduced data space (i.e., $25047$) from which samples were drawn during training. \textcolor{red}{The cross-validation scores decrease as more training samples have been used is due to the sampling strategy FLOLA-Voronoi. It selects points from non-linear regions and the sparsely sampled regions, making the model more and more accurate. It should be noted, the cross-validation scores fluctuate sometimes, that is  because new training samples points are selected from an untouched region, and the surrogate model is  recalculated to consider the new change.}
 
 %In order to ensure no over-fitting occurred, the surrogate model also provides accurate results for data points outside the reduced input space (cf. Table~\ref{tab:sumo parameters}), Figure~\ref{fig:sumo-test-data} plots the absolute error (in terms of throughput) of the surrogate model compared to simulation results. In total, 2070 random data points were generated from all $2.3 \times 10^7$ possible points. The figure also plots the actual simulated throughput of each point, to characterize the significance of the error. For the HT model, the absolute throughput estimation error stays below 0.02~Mbps for the first 2000 points (i.e., $96.6$\% of all data points). The absolute error only goes above $0.1$~Mbps for 3 data points (i.e., $0.14$\%). Similarly, for the LT model, the throughput estimation error stays below $0.004$~Mbps for the first 2000 data points, and only grows above $0.01$~Mbps for the worst 11 data points. In terms of the relative error (i.e., ratio between absolute throughput error and simulation results, not depicted) of the surrogate model compared to simulations, 95\% of all data points have an error below 6.6\% and 5.4\% for the HT and LT model respectively. For both models, 98\% of the data points have a relative error below 10\%. These results validate the ability of the surrogate model to estimate \gls{raw} performance accurately, even for points outside of the reduced input data space used for initial training.
 
-\textcolor{red}{
-In order to ensure no over-fitting occurred, the surrogate model also provides accurate results for data points outside the reduced input space (cf. Table~\ref{tab:sumo parameters}), Figure~\ref{fig:sumo-test-data} plots the \gls{cdf} of the relative error (i.e., ratio between absolute error and simulation results). In total, 5000 random data points were generated from all $2.3 \times 10^7$ possible points. It shows around 95\% and 98\% of the test data points has a relative error less than 10\% for the throughput and energy models of LT stations,respectively. Same results are obtained for the throughput and energy models of HT stations. 90\% of the test data points has a relative error less than 7\% for both throughput and energy models of LT stations, 7\% and 5\% for throughput and energy models of HT stations, respectively. These results validate the ability of the surrogate model to estimate \gls{raw} performance accurately, even for points outside of the reduced input data space used for initial training.}
+\textcolor{red}{In order to ensure no over-fitting occurred, the surrogate model also provides accurate results for data points outside the reduced input space (cf. Table~\ref{tab:sumo parameters}), Figure~\ref{fig:sumo-test-data} plots the \gls{cdf} of the relative error (i.e., ratio between absolute error and simulation results). In total, 5000 random data points were generated from all $2.3 \times 10^7$ possible points. It shows around 95\% and 98\% of the test data points has a relative error less than 10\% for the throughput and energy models of LT stations,respectively. Same results are obtained for the throughput and energy models of HT stations. 90\% of the test data points has a relative error less than 7\% for both throughput and energy models of LT stations, 7\% and 5\% for throughput and energy models of HT stations, respectively. These results validate the ability of the surrogate model to estimate \gls{raw} performance accurately, even for points outside of the reduced input data space used for initial training.}
 
 
 \subsection{\gls{raw} configuration analysis}
@@ -63,30 +59,31 @@ In order to ensure no over-fitting occurred, the surrogate model also provides a
 
 \begin{figure}[t]
     \centering
-    \subfloat[LT \label{fig:traffic-pattern-throughput}]{\includegraphics[width=0.35\textwidth]{image/LT-pareto-front-throughput}}\\
-    \subfloat[HT \label{fig:traffic-pattern-throughput}]{\includegraphics[width=0.35\textwidth]{image/HT-pareto-front-throughput}}
-  \caption{\gls{raw} configurations for top 10\% packet deliver ratio. \label{fig:ana-throughput}}
+    \subfloat[Throughput \label{fig:traffic-pattern-throughput}]{\includegraphics[width=0.35\textwidth]{image/LT-pareto-front-throughput}}\\
+    \subfloat[Energy consumption per packet \label{fig:traffic-pattern-energy}]{\includegraphics[width=0.35\textwidth]{image/LT-pareto-front-energyPerPacket}}
+  \caption{\gls{raw} configurations result in top 10\% throughput and energy efficiency. \label{fig:ana-throughput}}
 \end{figure}
 
-
+% \begin{figure}[t]
+%     \centering
+%     \subfloat[LT, energy per packet \label{fig:traffic-pattern-throughput}]{\includegraphics[width=0.35\textwidth]{image/LT-pareto-front-energyPerPacket}}\\
+%     \subfloat[Energy consumption per packet \label{fig:traffic-pattern-throughput}]{\includegraphics[width=0.35\textwidth]{image/HT-pareto-front-energyPerPacket}}
+%   \caption{\gls{raw} configurations for top 10\% highest energy efficiency. \label{fig:ana-energy}}
+% \end{figure}
 
 
 \begin{figure}[t]
     \centering
-    \subfloat[LT, energy per packet \label{fig:traffic-pattern-throughput}]{\includegraphics[width=0.35\textwidth]{image/LT-pareto-front-energyPerPacket}}\\
-    \subfloat[Energy consumption per packet \label{fig:traffic-pattern-throughput}]{\includegraphics[width=0.35\textwidth]{image/HT-pareto-front-energyPerPacket}}
-  \caption{\gls{raw} configurations for top 10\% highest energy efficiency. \label{fig:ana-energy}}
-\end{figure}
-
-
-\begin{figure}[t]
-    \centering
-    \subfloat[LT \label{fig:pareto-LT}]{\includegraphics[width=0.35\textwidth]{image/LT-pareto-front201}}\\
-    \subfloat[HT \label{fig:pareto-HT}]{\includegraphics[width=0.35\textwidth]{image/HT-pareto-front201}}
+    \subfloat[LT \label{fig:pareto-LT}]{\includegraphics[width=0.35\textwidth]{image/pareto-front101}}\\
+    \subfloat[HT \label{fig:pareto-HT}]{\includegraphics[width=0.35\textwidth]{image/pareto-front331}}
     \caption{Pareto front of throughput and energy per station. \label{fig:sumo-pareto}}
 \end{figure}
 
-\textcolor{red}{In this section, based on the built model, we analysis the impact of different \gls{raw} configurations on throughout and energy consumption, and the optimal \gls{raw} configuration. For each number of stations, we derive the highest output $t_{max}$ and  $e_{min}$ from the built mode $\mathcal{F}_t\left(\cdot\right)$, and Subsequently, we select the \gls{raw} configurations that lead to near optimal performance, i.e., throughput higher than 90\% of $t_{max}$, or energy consumption lower than  110\% of $e_{min}$. Figure \ref{fig:ana-throughput} and \ref{fig:ana-energy} depict these \gls{raw} configurations for 200, 300 and 400 stations, respectively. As the figures show, less number of stations have more near optimal \gls{raw} configurations, which is straightforward, since the channel contention is less fierce and less transmission time is required. Moreover, the near optimal \gls{raw} slot number is discontinuous distributed. For example, for \gls{raw} duration 204.800 ms and 200 stations, slot number [9, 16],  [21, 26] and [40, 50] achieve the highest throughput. The reason is that a varying number of holding time can be wasted due to the \gls{ncsb} feature \cite{Evgeny2018}. Further more, for small number of stations, for example, quite high performance can already be obtained by without \gls{RAW} (i.e., one \gls{raw} slot), while \gls{raw} is definitely needed for large number of stations. When there is not airtime limit, the packet deliver ratio and energy efficiency overlap, there exists some \gls{raw} configurations that can maximize both objectives simultaneously. Figure \ref{fig:sumo-pareto} plots the Pareto front of throughput and energy consumption per packet for 200 stations. As it shows, the LT stations have only one Pareto front solution, i.e., the objective of maximizing throughput and minimizing energy consumption can be achieved simultaneously. While the HT stations have several Pareto front solutions, different solutions can be chosen based on the preference on each objective.}
+\textcolor{red}{In this section, based on the built model, we analysis the impact of different \gls{raw} configurations on throughout and energy consumption, and the optimal \gls{raw} configuration. For each number of stations, we first find the highest output $t_{max}$ from the built mode $\mathcal{F}_t\left(\cdot\right)$, and find $e_{min}$ from model $\mathcal{F}_e^p \left(\cdot\right)$, which is calculated as follows:
+\begin{equation} \label{eq:objectiveF}
+\mathcal{F}_e^p (n_r, d_r, s_r) =     \frac{ \mathcal{F}_e (n_r, d_r, s_r) }{\mathcal{F}_t\left(n_r, d_r, s_r\right) }  
+\end{equation}
+model $\mathcal{F}_e^p (n_i, d_i, s_i)$ predict the energy consumption per packet for a RAW group $r$ with duration $d_r$, consisting of $s_r$ slots, and with $n_r$ stations assigned to it. Subsequently, we select the \gls{raw} configurations that lead to near optimal performance, i.e., throughput higher than 90\% of $t_{max}$, or energy consumption lower than  110\% of $e_{min}$. Figure \ref{fig:ana-throughput}  depict these \gls{raw} configurations for 100, 200 and 300 LT stations, respectively. As the figures show, for throughput, a small number of stations have more near optimal \gls{raw} configurations, which is straightforward. Since the channel contention is less fierce, fewer \gls{raw} slots number and less transmission time are required for reducing channel contention. Even without \gls{RAW} (i.e., one \gls{raw} slot), quite high performance can already be obtained, while \gls{raw} is definitely needed for large number of stations, for example, 200 and 300 stations. It should be noted that, the near optimal \gls{raw} slot number for throughput is discontinuous distributed. For example, for \gls{raw} duration 204.800 ms and 200 stations, slot number [9, 16],  [21, 26] and [40, 50] achieve the highest throughput. It is because a varying number of holding time can be wasted due to the \gls{ncsb} feature \cite{Evgeny2018}. Different from throughput, there is less near optimal \gls{raw} configurations for energy. \todo{explanation.} There exists some \gls{raw} configurations that can maximize throughput and minimize energy simultaneously. Figure \ref{fig:sumo-pareto} plots the Pareto front of throughput and energy consumption per packet for 100 and 400 LT stations. As it shows, the 400 stations have only one Pareto front solution, i.e., the objective of maximizing throughput and minimizing energy consumption can be achieved simultaneously. While the 100 stations have several Pareto front solutions, different solutions can be chosen based on the preference on each objective.}
 
 %For a certain slot number $s_r$ , once a high throughput can be achieved, a similar throughput can also be obtained with slot number $s_r^{'}$ larger than $s_r$. The reason is, $s_r^{'}$ number leads to less number of stations assigned to one \gls{raw} slot, therefore mitigate the channel contention, and maintain the throughput, or increase the throughput if there are more packets need to be sent. However, there are several exceptions. First of all, if the number of slots is too big, it may cause the \gls{raw} slot duration too short to transmit a single packet. Second,  \todo{the effect of non-cross slot boundary}. While for cross slot boundary, the performance fluctuation does not occur  \cite{WoWMoM2016} and \cite{Zheng2014}. Second, it can be observed that the normalized throughput increases in a fluctuating way as the duration of the RAW slot increases. The reason is that a varying number of mini-slots can be wasted due to the RAW slot handover between groups.
 
