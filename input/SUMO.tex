@@ -33,7 +33,7 @@ The modified controller conducts similar tasks as the original \gls{sumo} contro
 
 \item \label{sm_tr_4} After the experiments with the initial sample data set, the controller builds the surrogate model and calculates the cross validation score. %If the score is below a threshold, the experiment stops executing. Otherwise, it continues with the next step.
 
-\item \label{sm_tr_5} \textcolor{red}{The sampling strategy is applied to select the next sample data points to improve the model accuracy.} 
+\item \label{sm_tr_5} \textcolor{red}{The sampling strategy is applied to select the next 10 sample data points to improve the model accuracy.} 
 
 %The built surrogate model estimates the next sample data point to evaluate with the highest expected accuracy improvement. 
 
@@ -44,7 +44,9 @@ The modified controller conducts similar tasks as the original \gls{sumo} contro
 \end{enumerate}
 
 
-In our experiments, the SUMO toolbox is configured to use the latin hypercube sampling method~\cite{FAViana2013} to generate 100 initial sample data points, Kriging interpolation is used to train the model~\cite{JMLRv15couckuyt14a},  FLOLA-Voronoi sampling for generating the next sample points~\cite{van2015fuzzy}, and the 10-fold cross-validation with a \gls{rrse} measure to evaluate the model accuracy~\cite{van2016sensitivity}. The training stops once the cross-validation score lower than or equal to  $0.10$ \todo{change the number} (2 digits of precision) occurs $10$ times in succession, or the number of training data points exceeds $2500$. 
+In our experiments, the SUMO toolbox is configured to use the latin hypercube sampling method~\cite{FAViana2013} to generate 100 initial sample data points, Kriging interpolation is used to train the model~\cite{JMLRv15couckuyt14a},  FLOLA-Voronoi sampling for generating the next sample points~\cite{van2015fuzzy}, and the 10-fold cross-validation with a \gls{rrse} measure to evaluate the model accuracy~\cite{van2016sensitivity}.
+\textcolor{red}{The training stops once the cross-validation score remains stable (2 digits of precision) for $10$ times in succession (i.e., 100 sample data points), or the number of training data points exceeds $2500$.}
+%The training stops once the cross-validation score lower than or equal to  $0.10$ \todo{change the number} (2 digits of precision) occurs $10$ times in succession, or the number of training data points exceeds $2500$. 
 
 %\textcolor{red}{In k-fold cross-validation, the original sample is randomly partitioned into k equal size subsamples. Of the k subsamples, a single subsample is retained as the validation data for testing the model, and the remaining k-1 subsamples are used as training data. The cross-validation process is then repeated k times (the folds), with each of the k subsamples used exactly once as the validation data. The k results from the folds can then be averaged (or otherwise combined) to produce a single estimation}
 
@@ -89,6 +91,7 @@ Beacon interval (ms)           & 204.8 \\
 Size of transmission queue (packets)  & 10  \\
 Packet transmission interval (s)        & 1  \\
 Station distribution           & random  \\
+\textcolor{red}{Cross slot boundary           & false}  \\
 \hline
 \textbf{Low-Throughput (LT) parameters}  & \textbf{value} \\
 \hline
