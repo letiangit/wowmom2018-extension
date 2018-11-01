@@ -1,6 +1,6 @@
 \section{Surrogate Model of \gls{raw} performance \label{sec:SUMO}}
 
-This sections introduces the surrogate modeling approach and toolbox, as well as its integration with the ns-3 network simulator. Subsequently, we describe how surrogate modeling can be used to train a performance model using supervised machine learning, for estimating throughput of the IEEE~802.11ah \gls{raw} under a wide range of network and traffic conditions.
+This sections introduces the surrogate modeling approach and toolbox, as well as its integration with the ns-3 network simulator. Subsequently, we describe how surrogate modeling can be used to train a performance model using supervised machine learning, for estimating throughput and energy consumption of the IEEE~802.11ah \gls{raw} under a wide range of network and traffic conditions.
 %Table \ref{tab:variables} provides an overview of the variables used in the description of the RAW modeling and proposed algorithm in section \ref{sec:algorithm}.
 
 
@@ -11,12 +11,12 @@ This makes surrogate modeling highly suitable for \gls{raw} performance modeling
 
 
 
-\begin{figure}[t]
-  \centering
-   \subfloat[General SUMO modeling architecture. \label{fig:sumo}]{\includegraphics[width=0.7\columnwidth]{image/SUMO.pdf}}\\
-   \subfloat[Integrated \gls{raw} model training using SUMO and ns-3. \label{fig:SUMO_NS3}]{\includegraphics[width=0.7\columnwidth]{image/sumons3.pdf}}
+\begin{figure*}[t]
+ % \centering
+   \subfloat[General SUMO modeling architecture. \label{fig:sumo}]{\includegraphics[width=0.45\columnwidth]{image/SUMO.pdf}} \hfill
+   \subfloat[Integrated \gls{raw} model training using SUMO and ns-3. \label{fig:SUMO_NS3}]{\includegraphics[width=0.45\columnwidth]{image/sumons3.pdf}}
   \caption{Training methodology used to model \gls{raw} performance.}
-\end{figure}
+\end{figure*}
 
 The Matlab \glsreset{sumo}\gls{sumo} Toolbox is a flexible framework for accurate global surrogate modeling~\cite{SUMOtoolbox2010}. %It has been is applicable to a wide range of domains, including automotive, microwave filter, wireless network \cite{mehari2015}\cite{mehari2016}, etc. It supports a large set of plugins, each component is configurable and can easily be added, removed or replaced by custom implementations. The SUMO toolbox can be applied in an black-box fashion,
 The general \gls{sumo} modeling architecture is illustrated in Figure~\ref{fig:sumo}. The controller plays the key role, managing the modeling process. First, the user offers a set of initial sample data points (including input and output) to the controller. The controller uses those points to construct an initial surrogate model. Next, with the constructed model, the controller predicts the next input space element from which the expected accuracy improvement is the largest. The modeling process keeps iterating, and terminates once certain stopping conditions are met (e.g., the maximum training time is exceeded).
@@ -52,8 +52,8 @@ In our experiments, the SUMO toolbox is configured to use the latin hypercube sa
 
 \subsection{Training scenario}
 
-In this section, we provide an overview of the static simulation environment parameters used during training. Since the goal of \gls{raw} is scalability under uplink traffic, we consider an \gls{iot} sensing scenario, where sensors periodically monitor the environment and send the resulting data to a server (via the \gls{ap}). The PHY and MAC layer parameters are shown in Table~\ref{tab:ns3 parameters}. Given the low-power nature of battery powered sensors, the PHY layer parameters are configured based on the low-power 802.11ah radio hardware prototype developed by Ba et al.~\cite{Ba2016}, with a transmission power of 0~dBm, a gain of 0~dBi (for both sensor and \gls{ap}), and noise figure of 6.8~dB. In order to obtain a model that is independent of the actual deployment of stations, stations are randomly placed around the AP within a maximum radius. The size of the stations' transmit queues is configured to be 10 packets. \textcolor{red}{As the \gls{raw} duration could be shorter than beacon interval, there are still some remaining shared airtime outside of the \gls{raw} group. Contrast to the IEEE~802.11ah specification, in order to purely evaluate the \gls{raw} performance,  we disable packets transmission on  the shared airtime during the training. As no off-the-shelf IEEE 802.11ah hardware is available, we taken values of energy consumption of each state (i.e., i.e., transmitting, receiving, idle and sleeping) from the IEEE~802.11ah transceiver developed by Ba et al. \cite{ba20174mw}, and integrate them into the IEEE~802.11ah ns-3 simulator to track the energy consumption. %values of the transceiver developed by Ba et al.[23]. The values used to calculate the energy consumptionare 4.4 mW for the reception and idling and 7.2 mW forthe transmitting.
-} As the RAW optimization algorithm proposed in Section~\ref{sec:algorithm} groups together stations that use the same \gls{mcs}, the model assumes a fixed \gls{mcs}. However, as \gls{raw} performance depends on the \gls{mcs} used, a different model is to be trained for each \gls{mcs} that stations are expected to use. We illustrate this by developing a separate a high-throughput (HT) and low-throughput (LT) model for two different \gls{mcs} parameter sets. This can be trivially extended to other \gls{mcs} values.  For training simplicity, we assume each station sends one packet per second. However, we show in Section~\ref{sec:algorithm} how this model can be used to calculate \gls{raw} performance under arbitrary data transmission intervals. Each experiment runs for 60 seconds of simulated time. As \gls{raw} is configured in each beacon interval of 204.8~ms, the results of every simulated configuration are averaged over 290 beacon intervals, ensuring the generality of the trained model.
+In this section, we provide an overview of the static simulation environment parameters used during training. Since the goal of \gls{raw} is scalability under uplink traffic, we consider an \gls{iot} sensing scenario, where sensors periodically monitor the environment and send the resulting data to a server (via the \gls{ap}). The PHY and MAC layer parameters are shown in Table~\ref{tab:ns3 parameters}. Given the low-power nature of battery powered sensors, the PHY layer parameters are configured based on the low-power 802.11ah radio hardware prototype developed by Ba et al.~\cite{Ba2016}, with a transmission power of 0~dBm, a gain of 0~dBi (for both sensor and \gls{ap}), and noise figure of 6.8~dB. In order to obtain a model that is independent of the actual deployment of stations, stations are randomly placed around the AP within a maximum radius. The size of the stations' transmit queues is configured to be 10 packets. \textcolor{red}{As the \gls{raw} duration could be shorter than beacon interval, there are still some remaining shared airtime outside of the \gls{raw} group. In contrast to the IEEE~802.11ah specification, in order to purely evaluate the \gls{raw} performance,  we disable packets transmission on  the shared airtime during the training. As no off-the-shelf IEEE 802.11ah hardware is available, we taken values of energy consumption of each state (i.e., transmitting, receiving, idle and sleeping) from the IEEE~802.11ah transceiver developed by Ba et al. \cite{ba20174mw}, and integrate them into the IEEE~802.11ah ns-3 simulator to track the energy consumption. %values of the transceiver developed by Ba et al.[23]. The values used to calculate the energy consumptionare 4.4 mW for the reception and idling and 7.2 mW forthe transmitting.
+} As the RAW optimization algorithm proposed in Section~\ref{sec:algorithm} groups together stations that use the same \gls{mcs}, the model assumes a fixed \gls{mcs}. However, as \gls{raw} performance depends on the \gls{mcs} used, a different model is to be trained for each \gls{mcs} that stations are expected to use. We illustrate this by developing a separate high-throughput (HT) and low-throughput (LT) model for two different \gls{mcs} parameter sets. This can be trivially extended to other \gls{mcs} values.  For training simplicity, we assume each station sends one packet per second. However, we show in Section~\ref{sec:algorithm} how this model can be used to calculate \gls{raw} performance under arbitrary data transmission intervals. Each experiment runs for 60 seconds of simulated time. As \gls{raw} is configured in each beacon interval of 204.8~ms, the results of every simulated configuration are averaged over 290 beacon intervals, ensuring the generality of the trained model.
 
 %minimizing variety  the  the  high readability on the results  
 
@@ -61,8 +61,8 @@ In this section, we provide an overview of the static simulation environment par
 
 \begin{table}[t]
 \centering
-\renewcommand{\arraystretch}{1.2}
-%\tiny
+%\renewcommand{\arraystretch}{1.2}
+\footnotesize
 \caption{\textsc{Simulation parameters used during training}\label{tab:ns3 parameters}}
 \begin{tabular}{ll}
 \hline
@@ -91,7 +91,7 @@ Beacon interval (ms)           & 204.8 \\
 Size of transmission queue (packets)  & 10  \\
 Packet transmission interval (s)        & 1  \\
 Station distribution           & random  \\
-\textcolor{red}{Cross slot boundary           & false}  \\
+\textcolor{red}{Cross slot boundary}           & \textcolor{red}{false}  \\
 \hline
 \textbf{Low-Throughput (LT) parameters}  & \textbf{value} \\
 \hline
@@ -146,7 +146,7 @@ ${l}_r$         & RAW slot number of group $r$ \\
 % between two different criteria, namely exploration and
 % exploitation
 
-The surrogate model aims to accurately predict \textcolor{red}{performance (e.g., throughput, energy consumption}, for a RAW group $r$ with duration $d_r$, consisting of $s_r$ slots, and with $n_r$ stations assigned to it. The resulting model can be represented as functions $\mathcal{F}$ , as follows:
+The surrogate model aims to accurately predict \textcolor{red}{performance (e.g., throughput, energy consumption)} for a RAW group $r$ with duration $d_r$, consisting of $s_r$ slots, and with $n_r$ stations assigned to it. The resulting model can be represented as functions $\mathcal{F}$ , as follows:
 \begin{equation} \label{eq:sumo_model}
 t_r = \mathcal{F}(n_r, d_r, s_r) 
 \end{equation}
@@ -162,8 +162,8 @@ The actual step size of $n_r$ and $s_r$ is $1$, as they are integer variables. T
 
 \begin{table}[t]
 \centering
-\renewcommand{\arraystretch}{1.2}
-%\tiny
+%\renewcommand{\arraystretch}{1.2}
+\footnotesize
 \caption{\textsc{Definition of the input parameter space}\label{tab:sumo parameters}}
 \begin{tabular}{llll}
 \hline
@@ -179,7 +179,8 @@ $s_r$           & 1 & 5 & 50    \\
 
 \subsubsection{Output parameters design}
 \textcolor{red}{
-As non-linear regions are more difficult to model compared to linear regions, more sample points from the non-linear regions are required in the modelling process. 
-Therefore, a good selection of output parameter, which leads to more linear regions, can speed up the modeling process. For our models, there are several options on the output parameters, which can directly or indirectly represent the performance metrics (i.e., throughput and energy) that we focus on.  As in our modeling process, \gls{raw} group duration may be short than the beacon interval, we can use the throughput of the \gls{raw} groups or the throughput of the whole beacon interval as output parameter for throughput model. While the latter one results in more linear output than the former one does, since \gls{raw} group duration varies from data points to data points, while beacon interval is always constant. Similarly, energy consumption per packet or total energy consumption can be considered as output parameter for energy model. While the former one is the ratio between the latter one and the number of successfully transmitted packets, it leads to more more non-linear output than the latter one does. Therefore, we choose throughput of the whole beacon interval and  total energy consumption as output parameters for throughput and energy model, respectively. 
+As non-linear regions are more difficult to model compared to linear regions, more sample points from the non-linear regions are required in the modelling process. Therefore, a good selection of output parameter, which leads to more linear regions, can speed up the modeling process. 
+For our models, there are several options on the output parameters, which can directly or indirectly represent the performance metrics (i.e., throughput and energy) that we focus on. As in our modeling process, \gls{raw} group duration may be short than the beacon interval, we can use throughput over the \gls{raw} groups or throughput over the whole beacon interval as output parameter for throughput model. The latter one results in more linear output than the first one, since \gls{raw} group duration varies from data points to data points, while beacon interval is always constant. 
+Similarly, energy consumption per packet or total energy consumption can be considered as output parameter for energy model. While the former one is the ratio between the latter one and the number of successfully transmitted packets, leading to more non-linear output. Therefore, we choose throughput over the whole beacon interval and total energy consumption as output parameters for throughput and energy model, respectively. 
 %For the surrogate modeling, Kriging and FLOLA-Voronoi are used for model creation and sampling strategy, respectively. Kriging assumes that data points are spatially correlated, such that points that closer will have comparable performance, i.e., the performance difference between two date points is smaller if they are closer to each other than far away points. A novel sampling strategy called FLOLA-Voronoi [27] isused to select the next design points to improve the modelaccuracy. The FLOLA approach is used for exploiting the non-linear regions, while the Voronoi approach exploresthe sparsely sampled regions, the scores from the FLOLAand  Voronoi  are  combined  to  decide  the  next  samplepoint. In our experiments, 10 new data points are pickedin each interation
 }
