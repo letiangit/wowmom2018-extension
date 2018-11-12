@@ -166,12 +166,22 @@ The model $\mathcal{F}_e^p (n_i, d_i, s_i)$ predicts the energy consumption per 
   }
 \end{figure*}
 
-\begin{figure}[t]
-  \centering
-    \includegraphics[width=0.75\columnwidth]{image/withalpha}
-  \caption{\textcolor{red}{The performance of \gls{moroa} as a function of different $\alpha$
-}\label{fig:homo-alpha}}
-\end{figure}
+% \begin{figure}[t]
+%   \centering
+%     \includegraphics[width=0.75\columnwidth]{image/withalpha}
+%   \caption{\textcolor{red}{The performance of \gls{moroa} as a function of different $\alpha$
+% }\label{fig:homo-alpha}}
+% \end{figure}
+
+\begin{figure*}[t]
+    \centering
+    \subfloat[Throughput \label{fig:homo-alpha-throughput}]{\includegraphics[width=0.45\columnwidth]
+    {image/withalpha-throughput}} 
+    \subfloat[Energy consumption \label{fig:homo-alpha-energy}]{\includegraphics[width=0.45\columnwidth]
+    {image/withalpha-energy}}
+  \caption{\textcolor{red}{Performance of \gls{moroa} as a function of different $\alpha$} \label{fig:homo-alpha}
+  }
+\end{figure*}
 
 
 
@@ -192,7 +202,7 @@ As \gls{etaroa} was already shown to outperform \gls{edca} and other \gls{raw} o
 
 \textcolor{red}{Figure~\ref{fig:sumo-home} depicts performance in terms of throughput and energy consumption of \gls{moroa} and \gls{etaroa}. It clearly shows that, compared to \gls{etaroa}, \gls{moroa} can tune the values of $\alpha$ to optimize the required performance objective. For $\alpha = 1$, \gls{moroa} improves the throughput  up to 5.3\% under saturated traffic conditions for any number of stations. Under medium traffic conditions, \gls{moroa} also improves performance for a low number of stations. While \gls{moroa} consumes more energy than \gls{etaroa} does for both saturated and medium traffic conditions. 
 %Moreover, \gls{etaroa} has the similar power consumption for both traffic load, while the power consumption of \gls{moroa} increases when the network traffic load changes. 
-Conversely, when $\alpha$ is  $0$, \gls{moroa} consumes up to 24\% less energy at the cost of 4.4\% throughput decrease. This is due to the fact that \gls{etaroa} derives its optimal \gls{raw} parameters from a model of throughput under saturated state as an approximation, rather than optimizing them for different traffic conditions and objectives as the surrogate model does. This results in better overall performance in terms of throughput and energy efficiency. Figure \ref{fig:homo-alpha} zooms into \gls{moroa} performance with different $\alpha$ for 1024 stations and traffic load 0.15 Mpbs. It clearly shows, Compare to \gls{etaroa}, by adjusting the value of $\alpha$, \gls{moroa} can either obtain higher throughput or lower power consumption. Moreover, the energy consumption is significantly affected by $\alpha$, while $\alpha$ have a small impact on throughput. The above results reveal that, by using surrogate modeling, stations can be assigned to RAW groups in a more optimal way for the desired performance objective by adapting the $\alpha$ value. Moreover, these results show that by employing multi-objective optimization, a small reduction in throughput can lead to a significant improvement in terms of energy efficiency.
+Conversely, when $\alpha$ is  $0$, \gls{moroa} consumes up to 22.6\% less energy at the cost of 4.4\% throughput decrease. This is due to the fact that \gls{etaroa} derives its optimal \gls{raw} parameters from a model of throughput under saturated state as an approximation, rather than optimizing them for different traffic conditions and objectives as the surrogate model does. This results in better overall performance in terms of throughput and energy efficiency. Figure \ref{fig:homo-alpha} zooms into \gls{moroa} performance with different $\alpha$ for 1024 stations and traffic load 0.15 Mpbs. It clearly shows, Compared to \gls{etaroa}, that by adjusting the value of $\alpha$, \gls{moroa} can either obtain higher throughput or lower power consumption. Moreover, the energy consumption is significantly affected by $\alpha$, up to 22.6\% can be saved. While $\alpha$ has a small impact on throughput, only 4.5\% throughput can be improved.The above results reveal that, by using surrogate modeling, stations can be assigned to RAW groups in a more optimal way for the desired performance objective by adapting the $\alpha$ value. Moreover, these results show that by employing multi-objective optimization, a small reduction in throughput can lead to a significant improvement in terms of energy efficiency.
 %This is due to the fact that \gls{etaroa} derives its optimal \gls{raw} parameters from a model under saturated state as an approximation, rather than optimizing them for different traffic conditions as the surrogate model does. This results in better overall performance in terms of throughput and latency.
 }
 
