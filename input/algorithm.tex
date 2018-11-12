@@ -59,7 +59,8 @@ With:
 \end{equation}
 And
 \begin{equation} \label{eq:objectiveF}
-\mathcal{Q}_e =  \max_{i \in \left[1, k\right]} \left(  \frac{ \mathcal{F}_t (n_i, d_i, s_i)  \times l_i}{\mathcal{F}_t\left(n_i, d_i, s_i\right) \times T  \times E_i}  \right)
+%\mathcal{Q}_e =  \max_{i \in \left[1, k\right]} \left(  \frac{ \mathcal{F}_t (n_i, d_i, s_i)  \times l_i}{\mathcal{F}_t\left(n_i, d_i, s_i\right) \times T  \times E_i}  \right)
+\mathcal{Q}_e =  \max_{i \in \left[1, k\right]} \left(  \frac{ \mathcal{F}_t (n_i, d_i, s_i)  \times l_i}{\mathcal{F}_t\left(n_i, d_i, s_i\right) \times T  }  \right)
 %\mathcal{Q}_e =  \sum \limits_{i=1}^{k}  \frac{\mathcal{F}_e\left(n_i, d_i, s_i\right)}{\mathcal{F}_t\left(n_i, d_i, s_i\right) \times E_i}
 \end{equation}
 }
@@ -79,7 +80,11 @@ Subject to:
 
 
  \textcolor{red}{
- ${Q}_t$ represents the objective of throughput, while ${Q}_e$ represents the objective of energy consumption per packet. Both objectives try to find a balance among different groups. As the throughput and energy consumption depend on the \gls{mcs} and packet size, both objectives are normalized to align their valid value range and simplify selection of $\alpha$. $T$ denotes the training time. $E_i$ represents, when no channel contention occurs, energy consumed by a single packet transmission using the same \gls{mcs} and packet size as group $i$ does. \gls{raw} groups are allowed to use all the airtime (i.e., the entire beacon interval), as represented by Eq. \ref{eq:sslot}. A \gls{raw}-free period can be trivially introduced by changing this constraint.}
+ ${Q}_t$ represents the objective of throughput, while ${Q}_e$ represents the objective of energy consumption per packet. Both objectives try to find a balance among different groups. 
+ %As the throughput and energy consumption depend on the \gls{mcs} and packet size, both objectives are normalized to align their valid value range and simplify selection of $\alpha$. 
+ $T$ denotes the training time. 
+ %$E_i$ represents, when no channel contention occurs, energy consumed by a single packet transmission using the same \gls{mcs} and packet size as group $i$ does. 
+ \gls{raw} groups are allowed to use all the airtime (i.e., the entire beacon interval), as represented by Eq. \ref{eq:sslot}. A \gls{raw}-free period can be trivially introduced by changing this constraint.}
 %As such, in our algorithm, the airtime used by \gls{raw} groups do not contribute to the objectives.} 
 Note that this formulation assumes that stations will only attempt to transmit one packet per beacon interval. This assumption generally holds for sensor scenarios, where the throughput of individual stations is low~\cite{Khorov2015b}. In reality, some stations may have multiple packets queued, especially when the traffic estimator is still learning~\cite{Sensys2017}. However, this has a negligible effect on performance of the algorithm over longer periods. Currently, \gls{moroa} does not consider the required sequentially of \glspl{aid} in the \gls{rps} element, as we consider \gls{aid} reassignment a separate issue left for future work.
 
