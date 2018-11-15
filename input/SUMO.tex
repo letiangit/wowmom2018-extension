@@ -5,8 +5,8 @@ This sections introduces the surrogate modeling approach and toolbox, as well as
 
 
 \subsection{Surrogate model training methodology}
-In order for the \gls{ap} to determine the optimal \gls{raw} parameters in real-time, a \gls{raw} performance model is needed. Given the current network conditions (e.g., network topology, traffic) and a set of \gls{raw} parameter values (e.g., number of groups and slots, group duration, station assignment) the model should estimate performance (e.g., in terms of throughput \textcolor{red}{and energy}). Based on this model, optimal \gls{raw} parameters can subsequently be derived \textcolor{red}{for different objectives} based on current network conditions. However, existing analytical models are computationally expensive and unrealistic due to their assumptions. Surrogate modeling provides the answer~\cite{SUMOtoolbox2010}. A surrogate model is trained at design time, using a limited number of input-output sample data points obtained through simulation or real-life experiments. Surrogate modeling is especially suited for tasks with a large input space, as an accurate model can be trained based on relatively little input data points. Moreover, evaluating the model at runtime is computationally efficient, equivalent to a constant-time table lookup.
-%, \textcolor{red}{or can be easily executed by applying fast heuristic optimization algorithms (e.g., particle swarm optimization)} .
+In order for the \gls{ap} to determine the optimal \gls{raw} parameters in real-time, a \gls{raw} performance model is needed. Given the current network conditions (e.g., network topology, traffic) and a set of \gls{raw} parameter values (e.g., number of groups and slots, group duration, station assignment) the model should estimate performance (e.g., in terms of throughput \textcolor{black}{and energy}). Based on this model, optimal \gls{raw} parameters can subsequently be derived \textcolor{black}{for different objectives} based on current network conditions. However, existing analytical models are computationally expensive and unrealistic due to their assumptions. Surrogate modeling provides the answer~\cite{SUMOtoolbox2010}. A surrogate model is trained at design time, using a limited number of input-output sample data points obtained through simulation or real-life experiments. Surrogate modeling is especially suited for tasks with a large input space, as an accurate model can be trained based on relatively little input data points. Moreover, evaluating the model at runtime is computationally efficient, equivalent to a constant-time table lookup.
+%, \textcolor{black}{or can be easily executed by applying fast heuristic optimization algorithms (e.g., particle swarm optimization)} .
 This makes surrogate modeling highly suitable for \gls{raw} performance modeling, as the input space is very large, and efficient runtime model evaluation is needed for real-time \gls{raw} parameter selection. Additionally, by using realistic simulation results, a surrogate model does not suffer from the same restrictive assumptions as existing analytical models.
 
 
@@ -29,11 +29,11 @@ The modified controller conducts similar tasks as the original \gls{sumo} contro
 \item \label{sm_tr_2} The controller generates an initial sample set based on the input space, and starts ns-3 experiments with the required settings. 
 %The sample method used is Latin Hypercube Sampling (LHS), which is a stratified sampling method that selects sample points evenly along the input space while ensuring proportional representation of design variables. 
 
-\item \label{sm_tr_3} At the end of each experiment, the controller retrieves the evaluation criterion (e.g., throughput\textcolor{red}{, energy consumption}) of the experiment and builds the sample data space.  
+\item \label{sm_tr_3} At the end of each experiment, the controller retrieves the evaluation criterion (e.g., throughput\textcolor{black}{, energy consumption}) of the experiment and builds the sample data space.  
 
 \item \label{sm_tr_4} After the experiments with the initial sample data set, the controller builds the surrogate model and calculates the cross validation score. %If the score is below a threshold, the experiment stops executing. Otherwise, it continues with the next step.
 
-\item \label{sm_tr_5} \textcolor{red}{The sampling strategy is applied to select the next 10 sample data points to improve the model accuracy.} 
+\item \label{sm_tr_5} \textcolor{black}{The sampling strategy is applied to select the next 10 sample data points to improve the model accuracy.} 
 
 %The built surrogate model estimates the next sample data point to evaluate with the highest expected accuracy improvement. 
 
@@ -45,15 +45,15 @@ The modified controller conducts similar tasks as the original \gls{sumo} contro
 
 
 In our experiments, the SUMO toolbox is configured to use the latin hypercube sampling method~\cite{FAViana2013} to generate 100 initial sample data points, Kriging interpolation is used to train the model~\cite{JMLRv15couckuyt14a},  FLOLA-Voronoi sampling for generating the next sample points~\cite{van2015fuzzy}, and the 10-fold cross-validation with a \gls{rrse} measure to evaluate the model accuracy~\cite{van2016sensitivity}.
-\textcolor{red}{The training stops once the cross-validation score remains stable (2 digits of precision) for $10$ successive iterations (i.e., 100 sample data points), or the number of training data points exceeds $2500$.}
+\textcolor{black}{The training stops once the cross-validation score remains stable (2 digits of precision) for $10$ successive iterations (i.e., 100 sample data points), or the number of training data points exceeds $2500$.}
 %The training stops once the cross-validation score lower than or equal to  $0.10$ \todo{change the number} (2 digits of precision) occurs $10$ times in succession, or the number of training data points exceeds $2500$. 
 
-%\textcolor{red}{In k-fold cross-validation, the original sample is randomly partitioned into k equal size subsamples. Of the k subsamples, a single subsample is retained as the validation data for testing the model, and the remaining k-1 subsamples are used as training data. The cross-validation process is then repeated k times (the folds), with each of the k subsamples used exactly once as the validation data. The k results from the folds can then be averaged (or otherwise combined) to produce a single estimation}
+%\textcolor{black}{In k-fold cross-validation, the original sample is randomly partitioned into k equal size subsamples. Of the k subsamples, a single subsample is retained as the validation data for testing the model, and the remaining k-1 subsamples are used as training data. The cross-validation process is then repeated k times (the folds), with each of the k subsamples used exactly once as the validation data. The k results from the folds can then be averaged (or otherwise combined) to produce a single estimation}
 
 \subsection{Training scenario}
 
 In this section, we provide an overview of the static simulation environment parameters used during training. Since the goal of \gls{raw} is scalability under uplink traffic, we consider an \gls{iot} sensing scenario, where sensors periodically monitor the environment and send the resulting data to a server (via the \gls{ap}). The PHY and MAC layer parameters are shown in Table~\ref{tab:ns3 parameters}. Given the low-power nature of battery powered sensors, the PHY layer parameters are configured based on the low-power 802.11ah radio hardware prototype developed by Ba et al.~\cite{Ba2016}, with a transmission power of 0~dBm, a gain of 0~dBi (for both sensor and \gls{ap}), and noise figure of 6.8~dB. In order to obtain a model that is independent of the actual deployment of stations, stations are randomly placed around the AP within a maximum radius. The size of the stations' transmit queues is configured to be 10 packets.
-\textcolor{red}{As the \gls{raw} duration can be shorter than the beacon interval, there are still some remaining shared airtime outside of the \gls{raw} group. Allowing stations to transmit during this \gls{raw}-free period would alter performance results. As our goal is to purely model the performance of the \gls{raw} period itself, we disable packet transmissions during the shared airtime during training.} \textcolor{red}{Since no off-the-shelf IEEE 802.11ah hardware is available, we use energy consumption values for each radio state (i.e., transmitting, receiving, idle and sleeping) from the experimental IEEE~802.11ah transceiver developed by Ba et al. \cite{ba20174mw}. %values of the transceiver developed by Ba et al.[23]. The values used to calculate the energy consumptionare 4.4 mW for the reception and idling and 7.2 mW forthe transmitting.
+\textcolor{black}{As the \gls{raw} duration can be shorter than the beacon interval, there are still some remaining shared airtime outside of the \gls{raw} group. Allowing stations to transmit during this \gls{raw}-free period would alter performance results. As our goal is to purely model the performance of the \gls{raw} period itself, we disable packet transmissions during the shared airtime during training.} \textcolor{black}{Since no off-the-shelf IEEE 802.11ah hardware is available, we use energy consumption values for each radio state (i.e., transmitting, receiving, idle and sleeping) from the experimental IEEE~802.11ah transceiver developed by Ba et al. \cite{ba20174mw}. %values of the transceiver developed by Ba et al.[23]. The values used to calculate the energy consumptionare 4.4 mW for the reception and idling and 7.2 mW forthe transmitting.
 }
 
 As the RAW optimization algorithm proposed in Section~\ref{sec:algorithm} groups together stations that use the same \gls{mcs}, the model assumes a fixed \gls{mcs}. However, as \gls{raw} performance depends on the \gls{mcs} used, a different model is trained for each \gls{mcs} that stations are expected to use. We illustrate this by developing a separate high-throughput (HT) and low-throughput (LT) model for two different \gls{mcs} parameter sets. This can be trivially extended to other \gls{mcs} values.  For training simplicity, we assume each station sends one packet per second. However, we show in Section~\ref{sec:algorithm} how this model can be used to calculate \gls{raw} performance under arbitrary data transmission intervals.
@@ -62,7 +62,7 @@ Each experiment runs for 60 seconds of simulated time. As \gls{raw} is configure
 
 %minimizing variety  the  the  high readability on the results  
 
-%\textcolor{red}{TODO: we need to mention how many times (i.e., beacon intervals) each experiment is repeated for training, and show that this makes it robust to the random effects of CSMA...}
+%\textcolor{black}{TODO: we need to mention how many times (i.e., beacon intervals) each experiment is repeated for training, and show that this makes it robust to the random effects of CSMA...}
 
 \begin{table}[t]
 \centering
@@ -85,7 +85,7 @@ Error rate model               & YansErrorRate \\
 \hline
 % CWmin                          & 15 \\
 % CWmax                          & 1023      \\
-%Duration of AIFS (us)\textcolor{red}{change to DIFS}            & 316      \\
+%Duration of AIFS (us)\textcolor{black}{change to DIFS}            & 316      \\
 Traffic access categories             & \textcolor{black}{ AC\_{BE} } \\
 Duration of AIFS ($\mu$s)             & 264      \\
 Duration of SIFS ($\mu$s)            & 160      \\
@@ -96,7 +96,7 @@ Beacon interval (ms)           & 204.8 \\
 Size of transmission queue (packets)  & 10  \\
 Packet transmission interval (s)        & 1  \\
 Station distribution           & random  \\
-\textcolor{red}{Cross-slot boundary}           & \textcolor{red}{false}  \\
+\textcolor{black}{Cross-slot boundary}           & \textcolor{black}{false}  \\
 \hline
 \textbf{Low-Throughput (LT) parameters}  & \textbf{value} \\
 \hline
@@ -151,19 +151,19 @@ ${l}_r$         & RAW slot number of group $r$ \\
 % between two different criteria, namely exploration and
 % exploitation
 
-The surrogate model aims to accurately predict \textcolor{red}{performance (e.g., throughput, energy consumption)} for a RAW group $r$ with duration $d_r$, consisting of $s_r$ slots, and with $n_r$ stations assigned to it. The resulting model can be represented as functions $\mathcal{F}$ , as follows:
+The surrogate model aims to accurately predict \textcolor{black}{performance (e.g., throughput, energy consumption)} for a RAW group $r$ with duration $d_r$, consisting of $s_r$ slots, and with $n_r$ stations assigned to it. The resulting model can be represented as functions $\mathcal{F}$ , as follows:
 \begin{equation} \label{eq:sumo_model}
 t_r = \mathcal{F}(n_r, d_r, s_r) 
 \end{equation}
-In addition to throughput \textcolor{red}{and energy consumption}, the simulator calculates a variety of other performance metrics, such as packet loss and latency. As such, the same methodology as described here can be used to train a model for predicting these other performance metrics. However, to simplify the explanation, we focus on throughput \textcolor{red}{and energy}.
+In addition to throughput \textcolor{black}{and energy consumption}, the simulator calculates a variety of other performance metrics, such as packet loss and latency. As such, the same methodology as described here can be used to train a model for predicting these other performance metrics. However, to simplify the explanation, we focus on throughput \textcolor{black}{and energy}.
 
 \subsubsection{Input parameters design}
 To build the \gls{sumo} model, the input parameter space needs to be defined. It consists of the minimum and maximum value of each parameter, as well as a step size. The minimum and maximum can be determined based on expert knowledge of \gls{raw} performance, as well as legal values defined by the IEEE~802.11ah standard. The range of the number of stations $n_r$ in a \gls{raw} group should span from low to high traffic conditions, so the trained model gives accurate results independent of the density. From our previous studies on \gls{raw} performance~\cite{WoWMoM2016}, and based on the parameters listed in Table~\ref{tab:ns3 parameters}, a minimum value of $60$ and maximum value of $400$ stations per group were deemed to cover all possible traffic conditions. The RAW group duration should be large enough to send at least 1 packet successfully, and at most equal to the duration of the beacon intervals. As such, $d_r$ is varied between $40960$~$\mu$s and $204800$~$\mu$s. The number of slots $s_r$ is bound between $1$ and $64$, as per the IEEE standard. However, a very high number of slots leaves not enough time within a slot to successfully transmit a packet. As such, we limit $s_r$ between 1 and 50.
 
 The actual step size of $n_r$ and $s_r$ is $1$, as they are integer variables. The parameter $d_r$ has a step size of $120$~$\mu$s, as defined in the 802.11ah standard. This results in a total input space of $2.3 \times 10^7$ possible data points. This is too high to properly train the model in a feasible amount of time. To alleviate this, we experimentally determined a good step size for each of the three parameters, leveraging the trade-off between accuracy and training speed. For $n_r$ and $s_r$ a step size of 5 was selected. It was found that the \gls{raw} duration $d_r$ has a high sensitivity. As such, a small value of $5120$~$\mu$s was chosen as its step size. This results in a significantly reduced input space of $25047$ data points. Table~\ref{tab:sumo parameters} summarizes the selected input parameter space. Note that a slot count $s_r$ equal to $0$ is not legal, and $s_r$ therefore takes on values from the set $\left\{1, 5, 10, ..., 50\right\}$. Results for data points outside the reduced input parameter space are obtained via linear interpolation of the two nearest data points included in the model.
-%\textcolor{red} {The obtained surrogate model is extended by using linear interpolation to predict results of RAW configurations that are outside the reduced input parameters space.}
+%\textcolor{black} {The obtained surrogate model is extended by using linear interpolation to predict results of RAW configurations that are outside the reduced input parameters space.}
 
-%\textcolor{red}{TODO: we need to explain how you can obtain results for values that are outside of the listed training values (e.g., $n_i = 7$). That is currently not mentioned at all.}
+%\textcolor{black}{TODO: we need to explain how you can obtain results for values that are outside of the listed training values (e.g., $n_i = 7$). That is currently not mentioned at all.}
 
 \begin{table}[t]
 \centering
@@ -183,7 +183,7 @@ $s_r$           & 1 & 5 & 50    \\
 
 
 \subsubsection{Output parameters design}
-\textcolor{red}{
+\textcolor{black}{
 As non-linear regions are more difficult to model compared to linear regions, more sample points from the non-linear regions are required during the training process. Therefore, a good selection of output parameters, which leads to more linear regions, can speed up the training process. 
 For our models, there are several options for the output parameters, which can directly or indirectly represent the performance metrics (i.e., throughput and energy) that we focus on. As in our modeling process, \gls{raw} group duration may be shorter than the beacon interval, we can use throughput over the \gls{raw} groups or throughput over the whole beacon interval as output parameter for the throughput model. The latter one results in more linear output than the first one, since \gls{raw} group duration varies from data points to data points, while the beacon interval is constant. 
 Similarly, energy consumption per packet or total energy consumption can be considered as output parameter for the energy model. While the former one is the ratio between the latter one and the number of successfully transmitted packets, leading to more non-linear output. Therefore, we choose throughput over the whole beacon interval and total energy consumption as output parameters for the throughput and energy model respectively. 
