@@ -2,6 +2,12 @@
 
 This section presents the evaluation results of the \gls{raw} performance of surrogate model and the \gls{moroa} \gls{raw} optimization algorithm. First, the simulation setup is discussed. Second, the accuracy of the surrogate model is compared to simulation results. Finally, \gls{moroa} is evaluated and compared to state of the art \gls{raw} algorithms, as well as the traditional \gls{edca} method of IEEE~802.11.
 
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.75\columnwidth]{image/throughput_cv}
+  \caption{\textcolor{black}{Cross validation score of the surrogate models as a function of the number of training iterations.} \label{fig:sumo-iteraton}}
+\end{figure}
+
 \subsection{Simulation setup}
 
 
@@ -30,11 +36,7 @@ All evaluations are performed using our previously developed IEEE~802.11ah ns-3 
 
 \subsection{SUMO model validation}
 
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=0.75\columnwidth]{image/throughput_cv}
-  \caption{\textcolor{black}{Cross validation score of the surrogate models as a function of the number of training iterations.} \label{fig:sumo-iteraton}}
-\end{figure}
+
 
 
 %        \includegraphics[clip, trim=0.5cm 11cm 0.5cm 11cm, width=1.00\textwidth]{gfx/BI-yourfile.pdf}
@@ -42,7 +44,8 @@ All evaluations are performed using our previously developed IEEE~802.11ah ns-3 
 \begin{figure}[t]
   \centering
     \includegraphics[width=0.75\columnwidth]{image/model_error}
-  \caption{\textcolor{black}{Performance comparison between the surrogate model and simulation results for 2070 random test data points, sorted in ascending order in terms of estimation error}\label{fig:sumo-test-data}}
+  \caption{\textcolor{black}{Performance comparison between the surrogate model and simulation results for 5000 random test data points. %, sorted in ascending order in terms of estimation error
+  }\label{fig:sumo-test-data}}
 \end{figure}
 
 In this section we evaluate the training convergence of the surrogate model, as well as its accuracy compared to simulation results. Figure~\ref{fig:sumo-iteraton} plots the model's cross validation score as a function of the number of training samples used. The cross validation score provides a measure for the accuracy of the resulting model. A consistently low score signifies that the training process has converged. 
@@ -78,14 +81,16 @@ The model $\mathcal{F}_e^p (n_i, d_i, s_i)$ predicts the energy consumption per 
   \caption{\gls{raw} configurations that deviate at most 10\% from the optimal throughput or energy consumption. \label{fig:ana-throughput}}
 \end{figure*}
 
-\textcolor{black}{Figure~\ref{fig:ana-throughput}  depicts such \gls{raw} configurations for 100, 200 and 300 LT stations, respectively. As the figures show, if the number of stations is relatively small (i.e., 100), many different \gls{raw} configurations lead to near optimal throughput. This is because channel contention is less fierce in such a scenario, and the \gls{raw} configuration thus has less effect on throughput. Even without \gls{raw} (i.e., one \gls{raw} slot), quite high performance can already be obtained, while a larger number of \gls{raw} slots is definitely needed when the number of contending stations increases to 200 or 300). It should be noted that the near optimal number of \gls{raw} slots for throughput is discontinuously distributed. For example, for \gls{raw} duration 204.8 ms and 200 stations, a number of slots in the intervals 9--16, 21--26 and 40--50 achieve the highest throughput. This is because cross-slot boundary transmissions were disabled, which leads to varying amounts of wasted airtime (i.e., holding time) \cite{Evgeny2018}. Different from throughput, there are fewer near optimal \gls{raw} configurations for energy.}
-
-\begin{figure*}[t]
+\begin{figure*}[!h]
     \centering
     \subfloat[100 stations \label{fig:pareto-LT}]{\includegraphics[width=0.45\columnwidth]{image/pareto-front101}}
     \subfloat[400 stations \label{fig:pareto-HT}]{\includegraphics[width=0.45\columnwidth]{image/pareto-front331}}
     \caption{Pareto front of throughput and energy per station, pareto front points are highlighted in red. \label{fig:sumo-pareto}}
 \end{figure*}
+
+\textcolor{black}{Figure~\ref{fig:ana-throughput}  depicts such \gls{raw} configurations for 100, 200 and 300 LT stations, respectively. As the figures show, if the number of stations is relatively small (i.e., 100), many different \gls{raw} configurations lead to near optimal throughput. This is because channel contention is less fierce in such a scenario, and the \gls{raw} configuration thus has less effect on throughput. Even without \gls{raw} (i.e., one \gls{raw} slot), quite high performance can already be obtained, while a larger number of \gls{raw} slots is definitely needed when the number of contending stations increases to 200 or 300). It should be noted that the near optimal number of \gls{raw} slots for throughput is discontinuously distributed. For example, for \gls{raw} duration 204.8 ms and 200 stations, a number of slots in the intervals 9--16, 21--26 and 40--50 achieve the highest throughput. This is because cross-slot boundary transmissions were disabled, which leads to varying amounts of wasted airtime (i.e., holding time) \cite{Evgeny2018}. Different from throughput, there are fewer near optimal \gls{raw} configurations for energy.}
+
+
 
 \textcolor{black}{There exist some \gls{raw} configurations that can maximize throughput and minimize energy simultaneously, as depicted in Figure~\ref{fig:sumo-pareto}. This figure illustrates the Pareto front of throughput and energy consumption per packet for 100 and 400 LT stations. As shown, the 400 stations have only one Pareto front solution, i.e., the objective of maximizing throughput and minimizing energy consumption can be achieved simultaneously. While for 100 stations there are several Pareto front solutions. Among them, a solution can be chosen based on the relative importance of each of the two objectives, using a multi-objective \gls{raw} optimization algorithm such as \gls{moroa}.}
 
@@ -173,7 +178,7 @@ The model $\mathcal{F}_e^p (n_i, d_i, s_i)$ predicts the energy consumption per 
 % }\label{fig:homo-alpha}}
 % \end{figure}
 
-\begin{figure*}[t]
+\begin{figure*}
     \centering
     \subfloat[Throughput \label{fig:homo-alpha-throughput}]{\includegraphics[width=0.45\columnwidth]
     {image/withalpha-throughput}} 
@@ -237,7 +242,7 @@ Conversely, when $\alpha$ is  $0$, \gls{moroa} consumes up to 22.6\% less energy
 
 
 
-In this section, we study the performance of \gls{moroa} in a network with heterogeneous stations. Moreover, we evaluate the effects of the $\alpha$ weight parameter on throughput and \textcolor{black}{energy consumption of both LT and HT stations}, for a variety of network densities. As \gls{etaroa} only supports stations with the same \gls{mcs} and packet size, the results of \gls{moroa} are compared to \gls{edca} in this case. 
+In this section, we study the performance of \gls{moroa} in a network with heterogeneous stations. Moreover, we evaluate the effects of the $\alpha$ weight parameter on throughput and \textcolor{black}{energy consumption of both LT and HT stations}, for a variety of network densities. As \gls{etaroa} only supports stations with same \gls{mcs} and packet size, the results of \gls{moroa} are compared to \gls{edca} in this case. 
 
 %Figure \ref{fig:throughput-alpha} shows that by increasing the value of $\alpha$, higher throughput can be achieved. Between $\alpha=0.25$ and $\alpha=0.5$, throughput increases $22$\%, $36$\%, $44$\% for $1200$, $1400$ and $1600$ stations respectively. While for $\alpha$ less than $0.25$ or larger than $0.5$, the throughput does not significantly change. For the small size networks, it shows there is no need to tune $\alpha$. Figure~\ref{fig:fairness-alpha-percent} illustrates the fairness with different $\alpha$, depicting the same conclusion.  With smaller values of $\alpha$, more fairness is achieved in terms of relative transmitted number of packets between LT and HT stations. Increasing $\alpha$ results in more focus on throughput, resulting in more airtime being provided to the HT stations. %The interesting finding from figure \ref{fig:sumo-alpha} is, although $\alpha$ is defined between 0 and 1, the actual range that affects the results is much smaller. More investigation are needed about tunning the $\alpha$, in order to achieve the required performance, it is considered as  our next step. 
 

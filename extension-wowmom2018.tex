@@ -1,10 +1,10 @@
 %\documentclass[review]{elsarticle}
-\documentclass[preprint, 3p, 11pt]{elsarticle}
+\documentclass[review, 3p, 11pt]{elsarticle}
 
 \usepackage{lineno,hyperref}
 \modulolinenumbers[5]
 
-\journal{Journal of \LaTeX\ Templates}
+%\journal{Journal of \LaTeX\ Templates}
 
 %%%%%%%%%%%%%%%%%%%%%%%
 %% Elsevier bibliography styles
@@ -76,8 +76,11 @@
 % \newfontfamily{\ubuntufont}{Times NeW Roman}
 % \DeclareCaptionFont{ubuntu}{\ubuntufont}
 \usepackage[font={footnotesize}]{caption}
-\usepackage{setspace}
-\doublespacing
+%\usepackage{setspace}
+%\doublespacing
+%\setstretch{1.667} 
+
+%\onehalfspacing
 %\usepackage[left=3cm, right=3cm]{geometry}
 
 % \setlength{\hoffset}{0.46cm} %2,54 + 0.46
@@ -177,10 +180,24 @@ IEEE 802.11ah, restricted access window (RAW), surrogate model, real-time statio
 Part of this research was funded by the Flemish FWO SBO S004017N IDEAL-IoT (Intelligent DEnse And Long range IoT networks) project. Serena Santi is funded by the Fund For Scientific Research (FWO) Flanders under grant number 1S82118N.
 
 
-\bibliographystyle{IEEEtran}
+%\bibliographystyle{IEEEtran}
+%\bibliography{references.bib}
+
+
+% \bibnewpage 
+% {
+%   \doublespacing 
+%   \bibliography{references.bib}
+% }
+
+
+%\begingroup\doublespacing
+
+%\setstretch{1.667} 
+%\doublespacing
+\bibliographystyle{elsarticle-num}
 \bibliography{references.bib}
-
-
+%\endgroup
 
 
 
