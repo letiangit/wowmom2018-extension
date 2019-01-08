@@ -17,7 +17,7 @@ The proposed algorithm uses only information readily available at the \gls{ap}. 
 First, the \gls{ap} categorizes stations into different groups. 
 %\textcolor{black}{This step only needs to be done when the network topology changes}.
 In \gls{moroa}, this is based on \gls{mcs} and packet size, as these two factors influence the minimum time needed to successfully transmit a packet, and therefore the optimal slot duration. However, other grouping strategies can be used as well. Second, the \gls{ap} determines the traffic of each station, and selects the stations that are expected to have pending packets to transmit in the next beacon interval. As this information is not readily available to the \gls{ap}, it has to be estimated. We apply a traffic estimation method for \gls{iot} sensor traffic proposed in our previous work~\cite{Sensys2017}. 
-Finally, we utilize \gls{raw} performance models $\mathcal{F}\left(n, d, s\right)$ that take as input the number of stations $n$, the group duration $d$, and the number of slots $s$, and gives as output some performance metric $t$ (e.g., throughput, energy). This function serves as the basis for an optimization problem, that optimizes the \gls{raw} parameter decision variables $n$, $d$ and $s$, in order to maximize the selected performance metrics. \textcolor{black}{The optimization is subjected to a set of constraints that in turn ensure the traffic estimation for the following beacon intervals is accurate.} The output of the algorithm is a \gls{raw} configuration consisting of a set of groups, containing for each group a set of assigned stations, group duration, and the number of slots.Note that in the remainder of the description, we assume the use of the surrogate model described in Section~\ref{sec:SUMO}. However, any function $\mathcal{F}\left(n, d, s\right)$ that satisfies the above requirements and that can be calculated in real-time could be used in combination with \gls{moroa}. 
+Finally, we utilize \gls{raw} performance models $\mathcal{F}\left(n, d, s\right)$ that take as input the number of stations $n$, the group duration $d$, and the number of slots $s$, and gives as output some performance metric $t$ (e.g., throughput, energy). This function serves as the basis for an optimization problem, that optimizes the \gls{raw} parameter decision variables $n$, $d$ and $s$, in order to maximize the selected performance metrics. \textcolor{black}{The optimization is subjected to a set of constraints that in turn ensure the traffic estimation for the following beacon intervals is accurate.} The output of the algorithm is a \gls{raw} configuration consisting of a set of groups, containing for each group a set of assigned stations, group duration, and the number of slots. Note that in the remainder of the description, we assume the use of the surrogate model described in Section~\ref{sec:SUMO}. However, any function $\mathcal{F}\left(n, d, s\right)$ that satisfies the \st{above} requirements \textcolor{red}{on input and output parameters} and that can be calculated in real-time could be used in combination with \gls{moroa}. 
 
 
 
@@ -60,31 +60,50 @@ With:
 And
 \begin{equation} \label{eq:objectiveF}
 %\mathcal{Q}_e =  \max_{i \in \left[1, k\right]} \left(  \frac{ \mathcal{F}_t (n_i, d_i, s_i)  \times l_i}{\mathcal{F}_t\left(n_i, d_i, s_i\right) \times T  \times E_i}  \right)
-\mathcal{Q}_e =  \max_{i \in \left[1, k\right]} \left(  \frac{ \mathcal{F}_t (n_i, d_i, s_i)  \times l_i}{\mathcal{F}_t\left(n_i, d_i, s_i\right) \times T  }  \right)
+\mathcal{Q}_e =  \max_{i \in \left[1, k\right]} \left(  \frac{ \mathcal{F}_\textcolor{red}{e} (n_i, d_i, s_i)  \times l_i}{\mathcal{F}_t\left(n_i, d_i, s_i\right) \times \textcolor{red}{T_c}  }  \right)
 %\mathcal{Q}_e =  \sum \limits_{i=1}^{k}  \frac{\mathcal{F}_e\left(n_i, d_i, s_i\right)}{\mathcal{F}_t\left(n_i, d_i, s_i\right) \times E_i}
 \end{equation}
 }
 Subject to:
 \begin{equation} \label{eq:si}
-\forall i \in \left[1,k\right]: n_i \leq n_i^{b}
+\forall i \in \left[1,k\right]: n_i \leq n_i^{b}\textcolor{red}{, \quad 1 \leq k \leq 85}
 \end{equation}
+\textcolor{red}{
+\begin{equation} \label{eq:ni_range}
+10 \leq \sum\limits_{i=1}^{k} n_i \leq 100
+\end{equation}
+}
 \begin{equation} \label{eq:sslot}
- \sum\limits_{i=1}^{k} d_i \leq d_b
+\sum\limits_{i=1}^{k} d_i \leq d_b
 \end{equation}
+\textcolor{red}{
+\begin{equation} \label{eq:di_range}
+\begin{cases}
+d_i \leq 1969.12, \quad if \quad 1 \leq s_i \leq 8 \\
+d_i \leq 1990.4, \quad if \quad 9 \leq s_i \leq 64
+\end{cases}
+\end{equation}
+}
 \begin{equation} \label{eq:successpro}
  %\mathcal{F}_t \left(n_i, d_i, s_i\right)} {n_i \times l_i}
 \forall i \in \left[1,k\right]:  p_i^s < \frac{ n_i \times l_i}{\mathcal{F}_t \left( n_i, d_i, s_i\right)}
 \end{equation}
+
+
+
+
+
 \textcolor{black}{Where $\mathcal{F}_t\left(\cdot\right)$  and $\mathcal{F}_e\left(\cdot\right)$ represent the \gls{raw} model functions that predict throughput and energy consumption}. The variable $l_i$ is the average packet size of stations in cluster $i$. The continuous variable $\alpha \in \left[0, 1\right]$ is a weight used to define the relative importance of both sub-objectives. The parameter $d_b$ represents the duration of the beacon interval $b$. In Eq.~\ref{eq:successpro}, $p_i^s$ represents the successful packet transmission probability of \gls{raw} group $i$. This constraint is required, as the traffic estimation method we use, does not work properly under high packet loss due to contention~\cite{Sensor2017}. As such, we use $p_i^s=0.99$. When using other traffic estimation methods, this constraint may not be needed. 
 
 
 
- \textcolor{black}{
- ${Q}_t$ represents the objective of throughput, while ${Q}_e$ represents the objective of energy consumption per packet. Both objectives try to find a balance among different groups. 
+
+ ${Q}_t$ represents the objective of throughput, while ${Q}_e$ represents the objective of energy consumption per packet. Both objectives try to find a balance among different groups.  \textcolor{red}{The objective function, as illustrated in Eq. \ref{eq:objective}, 
+ seeks to maximize ${Q}_t$ and minimize ${Q}_e$.} 
  %As the throughput and energy consumption depend on the \gls{mcs} and packet size, both objectives are normalized to align their valid value range and simplify selection of $\alpha$. 
- $T$ denotes the training time. 
+ \textcolor{red}{$T_c$} denotes the training time. 
  %$E_i$ represents, when no channel contention occurs, energy consumed by a single packet transmission using the same \gls{mcs} and packet size as group $i$ does. 
- \gls{raw} groups are allowed to use all the airtime (i.e., the entire beacon interval), as represented by Eq. \ref{eq:sslot}. A \gls{raw}-free period can be trivially introduced by changing this constraint.}
+ \gls{raw} groups are allowed to use all the airtime (i.e., the entire beacon interval), as represented by Eq. \ref{eq:sslot}. A \gls{raw}-free period can be trivially introduced by changing this constraint. \textcolor{red}{Eq. \ref{eq:si} indicates that the number of stations that are allowed to access the channel should not exceed the the number of stations predicted to have packets queued for transmission.}
 %As such, in our algorithm, the airtime used by \gls{raw} groups do not contribute to the objectives.} 
 Note that this formulation assumes that stations will only attempt to transmit one packet per beacon interval. This assumption generally holds for sensor scenarios, where the throughput of individual stations is low~\cite{Khorov2015b}. In reality, some stations may have multiple packets queued, especially when the traffic estimator is still learning~\cite{Sensys2017}. However, this has a negligible effect on performance of the algorithm over longer periods. Currently, \gls{moroa} does not consider the required sequentially of \glspl{aid} in the \gls{rps} element, as we consider \gls{aid} reassignment a separate issue left for future work.
 
@@ -94,10 +113,12 @@ Note that this formulation assumes that stations will only attempt to transmit o
 
 %\textcolor{black}{For the moment, we slightly modify the RPS element to assign stations to the same RAW group without the sequential AID constraint, AID dynamic re-assignment is considered future work to fully stick to the 802.11ah requirement.}
 %To be able to assign modifying the PS-Poll frame structure in the 802.11ah standard Since only stations with sequential AID can be assigned to the same group, AID re-assignment to further optimize latency as well as throughput is considered future work.}
-The formulated problem is a non-linear constrained optimization problem with integer decision variables (i.e., $n_i$, $d_i$, and $s_i$). This can for example be solved using genetic algorithms. A relaxed version of the problem with continuous decision variables could alternatively be solved using for example the Interior-Point method, in combination with a rounding strategy to convert the resulting continuous decision variable values to integers. Moreover, by taking the characteristic 802.11ah into account, the value of $n_i$ and $k$ can be further limited, reducing the number of potential solutions and therefore the solving time. The sum of $n_i$ for all the RAW groups is limited to the maximum number of packet $n_{max}^b$ that can be successfully transmitted during one beacon interval. Due to the relatively low data rates supported by 802.11ah (i.e., up to 7.8~Mbps for a 2~MHz bandwidth), $n_{max}^b$ ranges from around $10$ to $100$ in practice. \textcolor{black}{ For homogeneous networks, we can use the corresponding $n_{max}^b$ based on the used \gls{mcs}. For heterogeneous networks in which multiple \gls{mcs}s are used, we can use the $n_{max}^b$ (equal to 100) of \gls{mcs} 8 for a 2~MHz bandwidth. In the \gls{rps} element, each \gls{raw} group definition requires between 3 and 12 bytes. As the maximum size of the \gls{rps} elements is $256$~bytes, the number of groups $k$ cannot be higher than 85.
+The formulated problem is a non-linear constrained optimization problem with integer decision variables (i.e., $n_i$, $d_i$, and $s_i$). This can for example be solved using genetic algorithms. A relaxed version of the problem with continuous decision variables could alternatively be solved using for example the Interior-Point method, in combination with a rounding strategy to convert the resulting continuous decision variable values to integers. Moreover, by taking the characteristic 802.11ah into account, the value of $n_i$ and $k$ can be further limited, \textcolor{red}{as depicted in
+Eq. \ref{eq:si}, Eq. \ref{eq:ni_range} and Eq. \ref{eq:di_range} 
+}. It reduces the number of potential solutions and therefore the solving time. The sum of $n_i$ for all the RAW groups is limited to the maximum number of packet $n_{max}^b$ that can be successfully transmitted during one beacon interval. Due to the relatively low data rates supported by 802.11ah (i.e., up to 7.8~Mbps for a 2~MHz bandwidth), $n_{max}^b$ ranges from around $10$ to $100$ in practice. \textcolor{black}{ For homogeneous networks, we can use the corresponding $n_{max}^b$ based on the used \gls{mcs}. For heterogeneous networks in which multiple \gls{mcs}s are used, we can use the $n_{max}^b$ (equal to 100) of \gls{mcs} 8 for a 2~MHz bandwidth. In the \gls{rps} element, each \gls{raw} group definition requires between 3 and 12 bytes. As the maximum size of the \gls{rps} elements is $256$~bytes, the number of groups $k$ cannot be higher than 85.
 %The number of groups $k$ cannot be higher than 42, as the maximum size of the \gls{rps} elements is $256$~bytes and at least $6$~bytes are needed per group. 
-Based on the specification of \gls{raw}, either the parameter $s_i$ is at most 64 and $d_i$ is at most $1990.4$~ms, or the parameter $s_i$ is at most 8 and $d_i$ is at most $1969.12$~ms
-}
+Based on the specification of \gls{raw}, either the parameter $s_i$ is at most 64 and $d_i$ is at most $1990.4$~ms, or the parameter $s_i$ is at most 8 and $d_i$ is at most $1969.12$~ms.
+}\textcolor{red}{While the minimal value of $d_i$ is $0.62$~ms.}
 
 % \subsection{\gls{raw} parameter optimization with heterogeneous stations}
 
