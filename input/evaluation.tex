@@ -163,11 +163,15 @@ The model $\mathcal{F}_e^p (n_i, d_i, s_i)$ predicts the energy consumption per 
 
 \begin{figure*}[t]
     \centering
-    \subfloat[Throughput \label{fig:traffic-pattern-throughput}]{\includegraphics[width=0.45\columnwidth]
+    \subfloat[LT, Throughput \label{fig:traffic-pattern-throughput}]{\includegraphics[width=0.45\columnwidth]
     {image/algorithm/throughput-aidaddress-alpha-1-0}} 
-    \subfloat[Energy consumption \label{fig:traffic-pattern-throughput}]{\includegraphics[width=0.45\columnwidth]
-    {image/algorithm/Energy_aidaddre_ncr-alpha-1-0}}
-  \caption{\textcolor{black}{Performance comparison between \gls{moroa} and \gls{etaroa} using $\alpha=0, 1$  for the LT scenarios with different traffic loads and station counts} \label{fig:sumo-home}
+    \subfloat[LT, Energy consumption \label{fig:traffic-pattern-throughput}]{\includegraphics[width=0.45\columnwidth]
+    {image/algorithm/Energy_aidaddre_ncr-alpha-1-0}} \\
+    \subfloat[HT, Throughput \label{fig:traffic-pattern-throughput}]{\includegraphics[width=0.45\columnwidth]
+    {image/algorithm/throughput-homo-nohidden-etaroa-aidaddress-alpha-1-0-HT}} 
+    \subfloat[HT, Energy consumption \label{fig:traffic-pattern-throughput}]{\includegraphics[width=0.45\columnwidth]
+    {image/algorithm/EnergyHomo_etraoa_aidaddre_ncr-alpha-1-0-HT}}
+  \caption{\textcolor{red}{Performance comparison between \gls{moroa} and \gls{etaroa} using $\alpha=0, 1$  for the LT and HT scenarios with different traffic loads and station counts} \label{fig:sumo-home}
   }
 \end{figure*}
 
@@ -180,11 +184,15 @@ The model $\mathcal{F}_e^p (n_i, d_i, s_i)$ predicts the energy consumption per 
 
 \begin{figure*}
     \centering
-    \subfloat[Throughput \label{fig:homo-alpha-throughput}]{\includegraphics[width=0.45\columnwidth]
+    \subfloat[LT, Throughput \label{fig:homo-alpha-throughput}]{\includegraphics[width=0.45\columnwidth]
     {image/withalpha-throughput}} 
-    \subfloat[Energy consumption \label{fig:homo-alpha-energy}]{\includegraphics[width=0.45\columnwidth]
-    {image/withalpha-energy}}
-  \caption{\textcolor{black}{Performance of \gls{moroa} as a function of different $\alpha$} \label{fig:homo-alpha}
+    \subfloat[LT, Energy consumption \label{fig:homo-alpha-energy}]{\includegraphics[width=0.45\columnwidth]
+    {image/withalpha-energy}} \\
+    \subfloat[HT, Throughput \label{fig:homo-alpha-throughput}]{\includegraphics[width=0.45\columnwidth]
+    {image/algorithm/withalpha-throughput-review}} 
+    \subfloat[LT, Energy consumption \label{fig:homo-alpha-energy}]{\includegraphics[width=0.45\columnwidth]
+    {image/algorithm/withalpha-energy-review}} 
+  \caption{\textcolor{red}{Performance of \gls{moroa} as a function of different $\alpha$} \label{fig:homo-alpha}
   }
 \end{figure*}
 
@@ -255,10 +263,10 @@ In terms of energy consumption, \gls{moroa} always significantly outperforms \gl
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.75\columnwidth]{image/algorithm/Final-collision-alpha-zoom-submission}
-  \caption{\textcolor{black}{Cross validation score of the surrogate models as a function of the number of training \textcolor{red}{sample data points}.} \label{fig:sumo-iteraton}}
+  \caption{\textcolor{red}{Collision comparison between MoROA using different α and EDCA/DCF, for a heterogeneous network.} \label{fig:collison}}
 \end{figure}
 
-\textcolor{red}{ The number of packets that collide with each other were counted during simulation, the results are depicted in Figure xx. It  clearly shows that, compare to \gls{edca}, \gls{moroa} significantly reduce the number of collisions. For 400 and 600 stations, the number of collision is 52845 and 60344. As the number of station increases, the number of collision goes up dramatically, around 1122775 for 1600 stations. In contrast, the number of collision \gls{moroa} is at most 29142, 97.4\% less than\gls{edca}. As collision may caused the packets to be dropped, \gls{moroa} obtains higher performance (e.g., throughput, energy) than \gls{edca}. It should be noted that \gls{moroa} with $alpha = 0$  have less collision than \gls{edca}, but lower throughput than \gls{edca}. This is due to the fact \gls{moroa} with $alpha = 0$ tries to avoid the collision as much as possible, in order to minimize the energy consumption. As such, the airtime is not fully utilized, leading to lower throughput.}
+\textcolor{red}{ The number of packets that collide with each other were counted during simulation, the results are depicted in Figure \ref{fig:collison}. It  clearly shows that, compare to \gls{edca}, \gls{moroa} significantly reduce the number of collisions. For 400 and 600 stations, the number of collision is 52845 and 60344. As the number of station increases, the number of collision goes up dramatically, around 1122775 for 1600 stations. In contrast, the number of collision \gls{moroa} is at most 29142, 97.4\% less than\gls{edca}. As collision may caused the packets to be dropped, \gls{moroa} obtains higher performance (e.g., throughput, energy) than \gls{edca}. It should be noted that \gls{moroa} with $alpha = 0$  have less collision than \gls{edca}, but lower throughput than \gls{edca}. This is due to the fact \gls{moroa} with $alpha = 0$ tries to avoid the collision as much as possible, in order to minimize the energy consumption. As such, the airtime is not fully utilized, leading to lower throughput.}
 
 
 
