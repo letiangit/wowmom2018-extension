@@ -33,7 +33,7 @@ The modified controller conducts similar tasks as the original \gls{sumo} contro
 
 \item \label{sm_tr_4} After the experiments with the initial sample data set, the controller builds the surrogate model and calculates the cross validation score. %If the score is below a threshold, the experiment stops executing. Otherwise, it continues with the next step.
 
-\item \label{sm_tr_5} \textcolor{black}{The sampling strategy is applied to select the next 10 sample data points to improve the model accuracy.} 
+\item \label{sm_tr_5} The sampling strategy is applied to select the next 10 sample data points to improve the model accuracy. \textcolor{red}{The step size of 10 is selected based on trail and error.}
 
 %The built surrogate model estimates the next sample data point to evaluate with the highest expected accuracy improvement. 
 
