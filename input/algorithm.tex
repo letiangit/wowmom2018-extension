@@ -3,8 +3,8 @@
 This section introduces the \glsreset{moroa}\gls{moroa}. It relies on the same principles as our previously proposed \gls{raw} optimization solutions \gls{taroa}~\cite{Sensor2017} and \gls{etaroa}~\cite{Sensys2017}. As such, it is also traffic-aware and able to adapt to changing traffic conditions. Moreover, \gls{moroa} supports heterogeneous stations with variable \gls{mcs} and packet size.
 %In contrast to previous work, \gls{moroa} differentiates in using a model to find the optimal \gls{raw} configuration parameters \textcolor{black}{for different objectives}. 
 %This allows it to better estimate the actual performance of a specific \gls{raw} configuration.
-\textcolor{black}{
-Finally, the extended algorithm presented here differentiates from our original version of \gls{moroa}~\cite{Tian2018} in the fact that it finds the optimal \gls{raw} configuration by optimizing both throughput and energy simultaneously, instead of focusing on a single objective.} 
+\textcolor{blue}{
+Finally, the extended algorithm presented here differentiates from our original version of \gls{moroa}~\cite{Tian2018} in the fact that it finds the optimal \gls{raw} configuration by optimizing both throughput and energy simultaneously, instead of only focusing on a single objective.} 
 
 % This section introduces the RAW optimization problem addressed in this article, and subsequently proposes the Traffic-Adaptive RAW Optimization Algorithm (TAROA). TAROA solves the RAW optimization problem in real-time, and is able to instantaneously adapt to changes in station association and traffic demand. Table~\ref{tab:variables} provides an overview of the variables used in the description of the RAW optimization problem and TAROA.
 
@@ -48,7 +48,7 @@ The problem can now be formulated as follows:
 %As stated in Section~\ref{sec:SUMO}, a variety of objective functions can be defined, as the model can be trivially trained for a variety of metrics such as throughput, latency, energy consumption, and packet loss. As an illustration, we define an objective function that maximizes throughput as well as \textcolor{black}{energy consumption per packet.}
 %fairness across groups in terms of packets delivery ratio.  The packet delivery ratio is defined as the ratio  between the total number of packets that are successfully received and the total number of packets generated.
 %However, other objectives such as airtime fairness, latency minimization can easily be defined as well. The problem can be formulated as follows:
-\textcolor{black}{
+
 \begin{equation} \label{eq:objective}
 \max \left( \alpha \times \mathcal{Q}_t - \left(1 - \alpha \right) \times \mathcal{Q}_e \right)
 \end{equation}
@@ -59,11 +59,9 @@ With:
 \end{equation}
 And
 \begin{equation} \label{eq:objectiveF}
-%\mathcal{Q}_e =  \max_{i \in \left[1, k\right]} \left(  \frac{ \mathcal{F}_t (n_i, d_i, s_i)  \times l_i}{\mathcal{F}_t\left(n_i, d_i, s_i\right) \times T  \times E_i}  \right)
-\mathcal{Q}_e =  \max_{i \in \left[1, k\right]} \left(  \frac{ \mathcal{F}_\textcolor{red}{e} (n_i, d_i, s_i)  \times l_i}{\mathcal{F}_t\left(n_i, d_i, s_i\right) \times \textcolor{red}{T_c}  }  \right)
-%\mathcal{Q}_e =  \sum \limits_{i=1}^{k}  \frac{\mathcal{F}_e\left(n_i, d_i, s_i\right)}{\mathcal{F}_t\left(n_i, d_i, s_i\right) \times E_i}
+\mathcal{Q}_e =  \max_{i \in \left[1, k\right]} \left(  \frac{ \mathcal{F}_{\textcolor{red}{e}} (n_i, d_i, s_i)  \times l_i} {\mathcal{F}_t\left(n_i, d_i, s_i\right) \times \textcolor{red}{T_c}  }  \right)
 \end{equation}
-}
+
 Subject to:
 \begin{equation} \label{eq:si}
 \forall i \in \left[1,k\right]: n_i \leq n_i^{b}\textcolor{red}{, \quad 1 \leq k \leq 85}

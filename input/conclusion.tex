@@ -1,16 +1,20 @@
 \section{Conclusion and Future Work \label{sec:conclusion}}
 
-In this paper, we present a novel solution for real-time \gls{raw} parameter optimization for IEEE~802.11ah, consisting of two contributions. First, we present a new \gls{raw} performance model, based on supervised surrogate modeling. 
+In this paper, we present a novel solution for real-time \gls{raw} parameter optimization for IEEE~802.11ah, consisting of two contributions. \textcolor{blue}{First, we present new \gls{raw} performance models for both throughput and energy efficiency, based on supervised surrogate modeling. 
 %It can be easily trained on a limited set of labeled data samples, which can be obtained through simulation. 
-\textcolor{black}{It can be easily trained on a limited set of labeled data samples, for a variety of performance metrics.}
-Moreover, it is very fast to evaluate once trained, allowing it to be used for real-time \gls{raw} parameter optimization. The second contribution encompasses a \gls{raw} optimization algorithm called \gls{moroa}. 
+It can be easily trained on a limited set of labeled data samples.}
+Moreover, it is very fast to evaluate once trained, allowing it to be used for real-time \gls{raw} parameter optimization.
+\textcolor{blue}{
+As a second contribution, we extended our original version of \gls{moroa}.}   %encompasses a \gls{raw} optimization algorithm called \gls{moroa}. }
 %It uses the surrogate model to determine the optimal \gls{raw} configuration under a variety of network and traffic conditions. Moreover, it supports heterogeneous stations with different \gls{mcs} and average packet sizes.
-\textcolor{black}{It uses surrogate models for the throughput and energy performance metrics to determine the optimal \gls{raw} configuration through multi-objective optimization under a variety of network and traffic conditions.} Moreover, it supports heterogeneous stations with different \gls{mcs} and average packet sizes.
+\textcolor{blue}{It uses surrogate models for the throughput and energy performance metrics to determine the optimal \gls{raw} configuration through multi-objective optimization under a variety of network and traffic conditions.} Moreover, it supports heterogeneous stations with different \gls{mcs} and average packet sizes.
 
 %\textcolor{black}{TODO: List some of the main conclusions of the simulation experiments. Done}
-The simulation results reveal three key points. First, the built surrogate model for \gls{raw} gets high accuracy relative to realistic simulation results. With a training set of $0.0074$\% of all possible data points, a relative error less than $7$\% for $90$\% of the randomly tested \gls{raw} configurations is achieved. 
+The simulation results reveal four key points. First, the built surrogate model for \gls{raw} gets high accuracy relative to realistic simulation results. With a training set of $0.0074$\% of all possible data points, a relative error less than $7$\% for $90$\% of the randomly tested \gls{raw} configurations is achieved. 
 %Second, by using the built surrogate model for \gls{raw}, \gls{moroa} achieves more stable throughput for both low- and high-density deployments as well as up to $32.5$\% lower latency, compared to the state of the art \gls{taroa} algorithm. 
-\textcolor{black}{Second, by using the built surrogate model for \gls{raw} and multi-objective approach, \gls{moroa} is able to either improve throughput up to 5.3\%,  or improve energy energy efficiency by 32.4\% at only a minor 3.26\% throughput loss, compared to the state of the art \gls{etaroa} algorithm. Most importantly, \gls{moroa} supports traffic-aware \gls{raw} optimization for heterogeneous scenarios with variable \glspl{mcs} and packets size. Its objective weight allows to attain either a 65\% throughput increase, or a 96\% energy saving, or a weighted solution in between.
+\textcolor{blue}{
+Second, the built surrogate models reveal that there are many RAW configurations that can result in optimal throughput, while only a few RAW configurations leading to high energy efficiency. 
+Moreover, different from our original version of \gls{moroa} that only focuses on throughput,  by using the built surrogate model for \gls{raw} and multi-objective approach, the extended \gls{moroa} is able to either improve throughput up to 5.3\%,  or improve energy energy efficiency by 32.4\% at only a minor 3.26\% throughput loss, compared to the state of the art \gls{etaroa} algorithm. Most importantly, \gls{moroa} supports traffic-aware \gls{raw} optimization for heterogeneous scenarios with variable \glspl{mcs} and packets size. Its objective weight allows to attain either a 65\% throughput increase, or a 96\% energy saving, or a weighted solution in between compared to the traditional \gls{edca} channel access method..
 %achieving up to 65\% higher throughput and up to 96\% less energy consumption than \gls{edca} in dense networks. 
 }
 
